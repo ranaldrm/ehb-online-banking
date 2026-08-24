@@ -8,9 +8,13 @@ public class BankingSystem {
 
         System.out.println(account1);
 
+        System.out.println("transactions" + account1.getTransactions().toString());
+
         account1.deposit(new BigDecimal("50.00"));
 
         System.out.println(account1);
+
+        System.out.println("transactions" + account1.getTransactions().toString());
 
         Account account2 = new Account ("124", Currency.USD);
 
@@ -19,6 +23,8 @@ public class BankingSystem {
         account2.withdraw(new BigDecimal("2.00"));
 
         System.out.println(account2);
+
+        System.out.println("transactions" + account2.getTransactions().toString());
 
 
     }
