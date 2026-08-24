@@ -6,4 +6,11 @@ public class ExceedsBalanceException extends BankingException{
 
         super(message);
     }
+
+        public ExceedsBalanceException(String message, Throwable cause){
+
+        super(message, cause);
+    }
+
+
 }
