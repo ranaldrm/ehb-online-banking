@@ -26,6 +26,10 @@ public class BankingSystem {
 
         System.out.println("transactions" + account2.getTransactions().toString());
 
+        System.out.println("total incoming transactions " + account2.getIncomingTransactions().toString());
+
+        System.out.println("total outgoing transaction sum " + account2.getTotalOutgoingPayments().toString());
+
 
     }
 
