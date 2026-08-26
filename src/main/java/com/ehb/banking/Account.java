@@ -55,14 +55,14 @@ public class Account {
     public BigDecimal getTotalOutgoingPayments() {
         return this.transactions.stream()
         .filter(transaction -> transaction.transactionType() == TransactionType.OUTGOING)
-        .map(Transaction::amount)
+        .map(Transaction::transactionAmount)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getTotalIncomingTransactionSum() {
         return this.transactions.stream()
         .filter(transaction -> transaction.transactionType() == TransactionType.INCOMING)
-        .map(Transaction::amount)
+        .map(Transaction::transactionAmount)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -99,6 +99,10 @@ public class Account {
 
     public BigDecimal getBalance() {
         return this.balance;
+    }
+
+    public Currency getCurrency() {
+        return this.currency;
     }
 
     @Override
