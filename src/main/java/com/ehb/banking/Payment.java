@@ -15,21 +15,26 @@ public class Payment {
     private final BigDecimal paymentAmount;
     private final LocalDateTime paymentTime;
     private final String sourceAccountNumber;
+    private final String targetAccountNumber;
 
 
 
-    public Payment (BigDecimal paymentAmount, String sourceAccountNumber) {
+    public Payment (BigDecimal paymentAmount, String sourceAccountNumber, String targetAccountNumber) {
         if (paymentAmount == null || paymentAmount.compareTo(BigDecimal.ZERO) <= 0){
             throw new NonPositiveAmountException("paymentAmount must be greater than 0 when creating payment");
         }
         if (sourceAccountNumber == null || sourceAccountNumber.isBlank()) {
             throw new InvalidPaymentException("sourceAccountNumber is required to create a Payment");
         }
+        if (targetAccountNumber == null || targetAccountNumber.isBlank()) {
+            throw new InvalidPaymentException("targetAccountNumber is required to create a Payment");
+        }
         this.paymentStatus = PaymentStatus.CREATED;
         this.paymentID =  UUID.randomUUID().toString();
         this.paymentAmount = paymentAmount;
         this.paymentTime = LocalDateTime.now();
         this.sourceAccountNumber = sourceAccountNumber;
+        this.targetAccountNumber = targetAccountNumber;
     }
 
     public PaymentStatus getPaymentStatus() {
@@ -51,6 +56,10 @@ public class Payment {
 
     public String getSourceAccountNumber() {
         return this.sourceAccountNumber;
+    }
+
+    public String getTargetAccountNumber() {
+        return this.targetAccountNumber;
     }
 
     public void validate() {

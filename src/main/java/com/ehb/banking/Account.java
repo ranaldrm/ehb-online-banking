@@ -15,18 +15,21 @@ public class Account {
     private final Currency currency;
     private final List<Transaction> transactions;
     private BigDecimal balance;
+    private final PaymentValidator paymentValidator;
 
-    // constructor
-    public Account(String accountNumber, Currency currency){
-        if (accountNumber  == null || currency == null ) {
-            throw new BankingException ("Account number and currency required to create Account");
+    public Account(String accountNumber, Currency currency) {
+        this(accountNumber, currency, null);
+    }
+
+    public Account(String accountNumber, Currency currency, PaymentValidator paymentValidator) {
+        if (accountNumber == null || currency == null) {
+            throw new BankingException("Account number and currency required to create Account");
         }
-        
         this.accountNumber = accountNumber;
         this.currency = currency;
         this.transactions = new ArrayList<>();
         this.balance = BigDecimal.ZERO;
-
+        this.paymentValidator = paymentValidator;
     }
 
     public String getAccountNumber(){
@@ -93,8 +96,29 @@ public class Account {
         
     }
 
+    public void processIncomingPayment(Payment payment) {
+        BigDecimal amount = payment.getPaymentAmount();
+        this.balance = this.balance.add(amount);
+        Transaction transaction = Transaction.of(TransactionType.INCOMING, amount);
+        this.transactions.add(transaction);
+    }
 
-
+    
+    public void processOutgoingPayment(BigDecimal paymentAmount, Account targetAccount) {
+        if (paymentValidator == null) {
+            throw new BankingException("No payment validator configured for account " + accountNumber);
+        }
+        
+        Payment payment = new Payment(paymentAmount, this.getAccountNumber(), targetAccount.getAccountNumber());
+        paymentValidator.validate(payment, this);
+        payment.validate();
+        payment.approve();
+        Transaction outGoingTransaction = Transaction.of(TransactionType.OUTGOING, payment.getPaymentAmount());
+        this.transactions.add(outGoingTransaction);
+        this.balance = this.balance.subtract(payment.getPaymentAmount());
+        targetAccount.processIncomingPayment(payment);
+        payment.complete();
+    }
 
 
     public BigDecimal getBalance() {
@@ -130,7 +154,5 @@ public class Account {
     public int hashCode() {
         return Objects.hash(accountNumber);
     }
-        
-
 
 }
