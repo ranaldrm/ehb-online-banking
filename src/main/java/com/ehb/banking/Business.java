@@ -3,6 +3,7 @@ package com.ehb.banking;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,6 +65,26 @@ public class Business {
         }
        
     }
+
+    @Override
+    public boolean equals (Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass() ){
+            return false;
+        }
+
+        Business other = (Business) obj;
+
+        return Objects.equals(this.getBusinessID(),other.getBusinessID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(businessID);
+    }
+
 
 
 

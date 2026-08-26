@@ -2,6 +2,7 @@ package com.ehb.banking;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.ehb.banking.exceptions.BankingException;
@@ -104,6 +105,26 @@ public class Account {
     public String toString() {
         return "Account{accountNumber='" + accountNumber + "', currency=" + currency + ", balance=" + balance + " transactionCount=" + transactions.size() + "}";
         
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Account other = (Account) obj;
+
+        return Objects.equals(this.accountNumber, other.accountNumber);
+             
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountNumber);
     }
         
 
