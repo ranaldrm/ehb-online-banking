@@ -1,13 +1,12 @@
 package com.ehb.banking;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ehb.banking.exceptions.BankingException;
 import com.ehb.banking.exceptions.ExceedsBalanceException;
 import com.ehb.banking.exceptions.NonPositiveAmountException;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class Account {
         
@@ -24,11 +23,14 @@ public class Account {
         
         this.accountNumber = accountNumber;
         this.currency = currency;
-        this.transactions = new ArrayList<Transaction>();
+        this.transactions = new ArrayList<>();
         this.balance = BigDecimal.ZERO;
 
     }
 
+    public String getAccountNumber(){
+        return this.accountNumber;
+    }
 
     public List <Transaction> getTransactions (){
 
