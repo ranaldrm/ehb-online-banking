@@ -107,6 +107,11 @@ class AccountTest {
     // --- Transaction Recording ---
 
     @Test
+    void newAccountHasEmptyTransactionHistory() {
+        assertTrue(account.getTransactions().isEmpty());
+    }
+
+    @Test
     void successfulDepositCreatesIncomingTransaction() {
         // Act
         account.deposit(new BigDecimal("100.00"));
@@ -136,5 +141,47 @@ class AccountTest {
 
         // Assert — no transaction recorded
         assertTrue(account.getTransactions().isEmpty());
+    }
+
+    // --- Transaction Query Methods ---
+
+    @Test
+    void getOutgoingTransactionsReturnsOnlyOutgoing() {
+        // Arrange — create both an incoming and an outgoing transaction
+        account.deposit(new BigDecimal("200.00"));
+        account.withdraw(new BigDecimal("75.00"));
+
+        // Act
+        var outgoing = account.getOutgoingTransactions();
+
+        // Assert — only the withdrawal appears; the deposit does not
+        assertEquals(1, outgoing.size());
+        assertEquals(TransactionType.OUTGOING, outgoing.get(0).transactionType());
+    }
+
+    @Test
+    void getOutgoingTransactionsReturnsEmptyListWhenNoneExist() {
+        // No transactions at all — list should be empty, not null
+        assertTrue(account.getOutgoingTransactions().isEmpty());
+    }
+
+    @Test
+    void getTotalOutgoingPaymentsReturnsSumOfOutgoingTransactions() {
+        // Arrange — two withdrawals of 30 and 20 = total 50
+        account.deposit(new BigDecimal("200.00"));
+        account.withdraw(new BigDecimal("30.00"));
+        account.withdraw(new BigDecimal("20.00"));
+
+        // Act
+        BigDecimal total = account.getTotalOutgoingPayments();
+
+        // Assert — using compareTo because BigDecimal equality is scale-sensitive
+        assertEquals(0, total.compareTo(new BigDecimal("50.00")));
+    }
+
+    @Test
+    void getTotalOutgoingPaymentsReturnsZeroWhenNoOutgoingTransactions() {
+        // No withdrawals — total should be zero
+        assertEquals(0, account.getTotalOutgoingPayments().compareTo(BigDecimal.ZERO));
     }
 }
