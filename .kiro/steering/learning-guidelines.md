@@ -60,6 +60,15 @@ In particular, explain concepts such as:
 
 Use current Spring Boot practices compatible with Java 21.
 
+## Stage
+The project is currently at stage 2. Relevant documentation at this stage: the overall project briefing is at /home/ranaldrm/Projects/ehb-online-banking/Documentation/EHB_Online_Banking_Project_Briefing.md
+
+The specific stage 2 briefing is at: /home/ranaldrm/Projects/ehb-online-banking/Documentation/Stage_two_Springboot_REST/EHB_Stage_2_Spring_Boot_REST_Briefing.md
+
+The tickets for stage 2 are at: /home/ranaldrm/Projects/ehb-online-banking/Documentation/Stage_two_Springboot_REST/EHB_Stage_2_Guided_Implementation_Tickets.md
+
+Right not you can ignore everything under the Stage_one_DomainModel folder.
+
 ## Reviews
 
 When reviewing code, consider separately:
