@@ -1,10 +1,10 @@
 package com.ehb.banking.service;
 
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.ehb.banking.Account;
+import com.ehb.banking.exceptions.AccountNotFoundException;
 import com.ehb.banking.repository.AccountRepository;
 
 
@@ -23,8 +23,9 @@ public class AccountService {
     }
 
 
-    public Optional<Account> getAccountByNumber(String accountNumber){
-        return accountRepository.findByAccountNumber(accountNumber);
+    public Account getAccountByNumber(String accountNumber){
+        return accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new AccountNotFoundException(accountNumber + ": account not found"));
+        
     }
 
 

@@ -1,6 +1,7 @@
 package com.ehb.banking.controller;
 
-import java.util.Optional;
+
+import com.ehb.banking.Account;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,8 +23,10 @@ public class AccountController {
     }
 
     @GetMapping("/{accountNumber}")
-    public Optional<AccountResponse> getAccount(@PathVariable(value="accountNumber") String accountNumber){
-        return accountService.getAccountByNumber(accountNumber).map(AccountResponse::from);
+    public AccountResponse getAccount(@PathVariable(value="accountNumber") String accountNumber){
+        
+        Account account = accountService.getAccountByNumber(accountNumber);
+        return AccountResponse.from(account);
     
     
 
