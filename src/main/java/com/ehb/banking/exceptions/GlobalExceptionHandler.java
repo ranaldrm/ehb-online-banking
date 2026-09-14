@@ -16,7 +16,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity <ErrorResponse> handleAccountNotFound(AccountNotFoundException ex) {
         ErrorResponse errorResponse = ErrorResponse.from(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-
-        
     }
+
+    @ExceptionHandler(BusinessNotFoundException.class)
+    public ResponseEntity <ErrorResponse> handleBusinessNotFound(BusinessNotFoundException ex) {
+        ErrorResponse errorResponse = ErrorResponse.from(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+
+
 }
