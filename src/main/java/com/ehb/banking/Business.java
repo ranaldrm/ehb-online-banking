@@ -20,6 +20,7 @@ public class Business {
 //this password is not included in the tickets but I want to include it so that at some later stage I can 
 //implement a simple UI and allow businesses to "login" and make payments etc.
     private String password;
+    
 
 
     public Business (String businessName, String password) {
