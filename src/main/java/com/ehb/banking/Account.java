@@ -104,7 +104,7 @@ public class Account {
     }
 
     
-    public void processOutgoingPayment(BigDecimal paymentAmount, Account targetAccount) {
+    public Payment processOutgoingPayment(BigDecimal paymentAmount, Account targetAccount) {
         if (paymentValidator == null) {
             throw new BankingException("No payment validator configured for account " + accountNumber);
         }
@@ -118,6 +118,7 @@ public class Account {
         this.balance = this.balance.subtract(payment.getPaymentAmount());
         targetAccount.processIncomingPayment(payment);
         payment.complete();
+        return payment;
     }
 
 
