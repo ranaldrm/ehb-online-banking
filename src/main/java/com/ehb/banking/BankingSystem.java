@@ -9,7 +9,7 @@ public class BankingSystem {
         // Build a composite validator with all payment rules
         PaymentValidator paymentValidator = new CompositePaymentValidator(List.of(
             new PositiveAmountValidator(),
-            new CurrencyMatchValidator(Currency.GBP),
+            new CurrencyMatchValidator(),
             new SufficientFundsValidator()
         ));
 
@@ -27,7 +27,7 @@ public class BankingSystem {
 
         Account account2 = new Account("124", Currency.USD, new CompositePaymentValidator(List.of(
             new PositiveAmountValidator(),
-            new CurrencyMatchValidator(Currency.USD),
+            new CurrencyMatchValidator(),
             new SufficientFundsValidator()
         )));
 
@@ -44,7 +44,7 @@ public class BankingSystem {
         System.out.println("total outgoing transaction sum " + account2.getTotalOutgoingPayments().toString());
 
         // Example: create a payment from account1 to account2
-        Payment payment = new Payment(new BigDecimal("10.00"), account1.getAccountNumber(), account2.getAccountNumber());
+        Payment payment = new Payment(new BigDecimal("10.00"), account1.getAccountNumber(), account2.getAccountNumber(), account1.getCurrency());
         System.out.println("Payment from " + payment.getSourceAccountNumber() + " to " + payment.getTargetAccountNumber());
 
 

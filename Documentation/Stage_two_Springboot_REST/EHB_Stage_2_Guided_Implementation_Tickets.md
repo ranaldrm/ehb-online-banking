@@ -2081,6 +2081,7 @@ unexplained annotations.
 [ ] S2-11 — Create the Payment Request DTO
 [ ] S2-12 — Validate Incoming Payment Requests
 [ ] S2-13 — Introduce PaymentService
+[ ] S2-13.5 — Fix Currency Design in the Payment Domain Model
 [ ] S2-14 — Create the Payment POST Endpoint
 [ ] S2-15 — Create the Payment Response DTO
 [ ] S2-16 — Centralise API Error Handling

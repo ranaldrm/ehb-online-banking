@@ -109,7 +109,7 @@ public class Account {
             throw new BankingException("No payment validator configured for account " + accountNumber);
         }
         
-        Payment payment = new Payment(paymentAmount, this.getAccountNumber(), targetAccount.getAccountNumber());
+        Payment payment = new Payment(paymentAmount, this.getAccountNumber(), targetAccount.getAccountNumber(), currency);
         paymentValidator.validate(payment, this);
         payment.validate();
         payment.approve();

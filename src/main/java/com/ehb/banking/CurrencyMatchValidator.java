@@ -8,20 +8,22 @@ import com.ehb.banking.exceptions.InvalidPaymentException;
  */
 public class CurrencyMatchValidator implements PaymentValidator {
 
-    private final Currency expectedCurrency;
+   
 
     /**
      * @param expectedCurrency the currency the payment must be denominated in
      */
-    public CurrencyMatchValidator(Currency expectedCurrency) {
-        this.expectedCurrency = expectedCurrency;
+    public CurrencyMatchValidator() {
+     
     }
+
+
 
     @Override
     public void validate(Payment payment, Account account) {
-        if (!account.getCurrency().equals(expectedCurrency)) {
+        if (!account.getCurrency().equals(payment.getCurrency())) {
             throw new InvalidPaymentException(
-                    "Payment currency " + expectedCurrency
+                    "Payment currency " + payment.getCurrency()
                     + " does not match account currency " + account.getCurrency()
                     + " on account " + account.getAccountNumber());
         }
