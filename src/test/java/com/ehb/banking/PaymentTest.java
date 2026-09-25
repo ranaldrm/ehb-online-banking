@@ -11,6 +11,7 @@ import com.ehb.banking.exceptions.ExceedsBalanceException;
 import com.ehb.banking.exceptions.InvalidPaymentTransitionException;
 import com.ehb.banking.exceptions.NonPositiveAmountException;
 
+
 class PaymentTest {
 
     // -----------------------------------------------------------------------
@@ -28,7 +29,7 @@ class PaymentTest {
 
     @Test
     void newPaymentHasCreatedStatus() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222",Currency.GBP);
 
         assertEquals(PaymentStatus.CREATED, payment.getPaymentStatus());
     }
@@ -39,7 +40,7 @@ class PaymentTest {
 
     @Test
     void createdPaymentCanBeValidated() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
 
         payment.validate();
 
@@ -48,7 +49,7 @@ class PaymentTest {
 
     @Test
     void validatedPaymentCanBeApproved() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.validate();
 
         payment.approve();
@@ -58,7 +59,7 @@ class PaymentTest {
 
     @Test
     void approvedPaymentCanBeCompleted() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.validate();
         payment.approve();
 
@@ -69,7 +70,7 @@ class PaymentTest {
 
     @Test
     void createdPaymentCanBeRejected() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
 
         payment.reject();
 
@@ -78,7 +79,7 @@ class PaymentTest {
 
     @Test
     void validatedPaymentCanBeRejected() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.validate();
 
         payment.reject();
@@ -88,7 +89,7 @@ class PaymentTest {
 
     @Test
     void approvedPaymentCanBeRejected() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.validate();
         payment.approve();
 
@@ -103,14 +104,14 @@ class PaymentTest {
 
     @Test
     void approvingCreatedPaymentThrows() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222",Currency.GBP);
 
         assertThrows(InvalidPaymentTransitionException.class, payment::approve);
     }
 
     @Test
     void completingValidatedPaymentThrows() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.validate();
 
         assertThrows(InvalidPaymentTransitionException.class, payment::complete);
@@ -118,7 +119,7 @@ class PaymentTest {
 
     @Test
     void completingRejectedPaymentThrows() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.reject();
 
         assertThrows(InvalidPaymentTransitionException.class, payment::complete);
@@ -126,7 +127,7 @@ class PaymentTest {
 
     @Test
     void transitioningCompletedPaymentToAnyStatusThrows() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.validate();
         payment.approve();
         payment.complete();
@@ -138,7 +139,7 @@ class PaymentTest {
 
     @Test
     void transitioningRejectedPaymentToAnyStatusThrows() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.reject();
 
         assertThrows(InvalidPaymentTransitionException.class, payment::validate);
@@ -154,13 +155,13 @@ class PaymentTest {
     void paymentWithZeroAmountCannotBeCreated() {
         // The Payment constructor itself guards against non-positive amounts
         assertThrows(NonPositiveAmountException.class,
-                () -> new Payment(BigDecimal.ZERO, "11111111", "22222222"));
+                () -> new Payment(BigDecimal.ZERO, "11111111", "22222222", Currency.GBP));
     }
 
     @Test
     void paymentWithNegativeAmountCannotBeCreated() {
         assertThrows(NonPositiveAmountException.class,
-                () -> new Payment(new BigDecimal("-50.00"), "11111111", "22222222"));
+                () -> new Payment(new BigDecimal("-50.00"), "11111111", "22222222", Currency.GBP));
     }
 
     @Test
@@ -215,7 +216,7 @@ class PaymentTest {
 
     @Test
     void callingCompleteOnAlreadyCompletedPaymentThrows() {
-        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222");
+        Payment payment = new Payment(new BigDecimal("100.00"), "11111111", "22222222", Currency.GBP);
         payment.validate();
         payment.approve();
         payment.complete();
