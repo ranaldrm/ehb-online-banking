@@ -1,6 +1,7 @@
 package com.ehb.banking.service;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -33,6 +34,12 @@ public class AccountService {
 
     public List<Transaction> getTransactionHistory(String accountNumber){
         return getAccountByNumber(accountNumber).getTransactions();
+    }
+
+    public Transaction deposit(String accountNumber, BigDecimal amount) {
+        Account account = getAccountByNumber(accountNumber);
+        return account.deposit(amount);
+
     }
 
 

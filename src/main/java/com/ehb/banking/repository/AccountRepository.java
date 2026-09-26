@@ -1,5 +1,6 @@
 package com.ehb.banking.repository;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,9 @@ public class AccountRepository {
         Account account3 = new Account("3333", Currency.USD, validator);
         Account account4 = new Account("4444", Currency.GBP, validator);
         Account account5 = new Account("5555", Currency.EUR, validator);
+        account1.deposit(new BigDecimal("500.00"));
+        account4.deposit(new BigDecimal("500.00"));
+
         accounts.put(account1.getAccountNumber(), account1);
         accounts.put(account2.getAccountNumber(), account2);
         accounts.put(account3.getAccountNumber(), account3);

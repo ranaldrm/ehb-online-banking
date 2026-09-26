@@ -2068,27 +2068,28 @@ unexplained annotations.
 # Stage 2 Progress Checklist
 
 ``` text
-[ ] S2-01 — Add Spring Boot to the Existing Maven Project
-[ ] S2-02 — Create the Spring Boot Application Entry Point
-[ ] S2-03 — Create the First REST Endpoint
-[ ] S2-04 — Create Simple In-Memory Account Storage
-[ ] S2-05 — Introduce AccountService and Dependency Injection
-[ ] S2-06 — Retrieve an Account Through REST
-[ ] S2-07 — Introduce an Account Response DTO
-[ ] S2-08 — Handle Unknown Accounts with HTTP 404
-[ ] S2-09 — Expose Account Transaction History
-[ ] S2-10 — Expose Businesses and Their Accounts
-[ ] S2-11 — Create the Payment Request DTO
-[ ] S2-12 — Validate Incoming Payment Requests
-[ ] S2-13 — Introduce PaymentService
+[ ] S2-01   — Add Spring Boot to the Existing Maven Project
+[ ] S2-02   — Create the Spring Boot Application Entry Point
+[ ] S2-03   — Create the First REST Endpoint
+[ ] S2-04   — Create Simple In-Memory Account Storage
+[ ] S2-05   — Introduce AccountService and Dependency Injection
+[ ] S2-06   — Retrieve an Account Through REST
+[ ] S2-07   — Introduce an Account Response DTO
+[ ] S2-08   — Handle Unknown Accounts with HTTP 404
+[ ] S2-09   — Expose Account Transaction History
+[ ] S2-10   — Expose Businesses and Their Accounts
+[ ] S2-11   — Create the Payment Request DTO
+[ ] S2-12   — Validate Incoming Payment Requests
+[ ] S2-13   — Introduce PaymentService
 [ ] S2-13.5 — Fix Currency Design in the Payment Domain Model
-[ ] S2-14 — Create the Payment POST Endpoint
-[ ] S2-15 — Create the Payment Response DTO
-[ ] S2-16 — Centralise API Error Handling
-[ ] S2-17 — Revisit Payment Validator Construction
-[ ] S2-18 — Add REST / Controller Tests
-[ ] S2-19 — Refactor the Stage 2 Package Structure
-[ ] S2-20 — Stage 2 End-to-End Integration Checkpoint
+[ ] S2-14   — Create the Payment POST Endpoint
+[ ] S2-15   — Create the Payment Response DTO
+[ ] S2-15.5 — Add a Deposit Endpoint
+[ ] S2-16   — Centralise API Error Handling
+[ ] S2-17   — Revisit Payment Validator Construction
+[ ] S2-18   — Add REST / Controller Tests
+[ ] S2-19   — Refactor the Stage 2 Package Structure
+[ ] S2-20   — Stage 2 End-to-End Integration Checkpoint
 ```
 
 Once S2-20 is complete, the project is ready to move into **Stage 3:

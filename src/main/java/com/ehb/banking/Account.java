@@ -70,13 +70,14 @@ public class Account {
     }
 
 
-    public void deposit(BigDecimal amount){
+    public Transaction deposit(BigDecimal amount){
         if ( amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
             throw new NonPositiveAmountException("Deposit amount must be greater than 0");
         }
         Transaction transaction = Transaction.of(TransactionType.INCOMING, amount);
         this.transactions.add(transaction);   
         this.balance = this.balance.add(amount);
+        return transaction;
 
     }
 
