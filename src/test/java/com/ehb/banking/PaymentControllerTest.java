@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.ehb.banking.controller.PaymentController;
+import com.ehb.banking.domain.Currency;
+import com.ehb.banking.domain.Payment;
 import com.ehb.banking.exceptions.ExceedsBalanceException;
 import com.ehb.banking.service.AccountService;
 import com.ehb.banking.service.PaymentService;

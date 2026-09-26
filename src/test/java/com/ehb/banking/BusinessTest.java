@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Business;
+import com.ehb.banking.domain.Currency;
+
 class BusinessTest {
 
     private Business business;

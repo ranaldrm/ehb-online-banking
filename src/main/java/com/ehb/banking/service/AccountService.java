@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ehb.banking.Account;
-import com.ehb.banking.Transaction;
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Transaction;
 import com.ehb.banking.exceptions.AccountNotFoundException;
 import com.ehb.banking.repository.AccountRepository;
 

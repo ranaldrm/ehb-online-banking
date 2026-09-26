@@ -7,9 +7,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Currency;
+import com.ehb.banking.domain.Payment;
+import com.ehb.banking.domain.PaymentStatus;
+import com.ehb.banking.domain.TransactionType;
 import com.ehb.banking.exceptions.ExceedsBalanceException;
 import com.ehb.banking.exceptions.InvalidPaymentTransitionException;
 import com.ehb.banking.exceptions.NonPositiveAmountException;
+import com.ehb.banking.validation.CompositePaymentValidator;
+import com.ehb.banking.validation.PaymentValidator;
+import com.ehb.banking.validation.PositiveAmountValidator;
+import com.ehb.banking.validation.SufficientFundsValidator;
 
 
 class PaymentTest {

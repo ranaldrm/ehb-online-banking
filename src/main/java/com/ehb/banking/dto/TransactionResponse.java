@@ -3,8 +3,8 @@ package com.ehb.banking.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.ehb.banking.Transaction;
-import com.ehb.banking.TransactionType;
+import com.ehb.banking.domain.Transaction;
+import com.ehb.banking.domain.TransactionType;
 
 public record TransactionResponse (
     String identifier, 

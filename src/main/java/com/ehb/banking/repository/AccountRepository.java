@@ -8,13 +8,13 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.ehb.banking.Account;
-import com.ehb.banking.CompositePaymentValidator;
-import com.ehb.banking.Currency;
-import com.ehb.banking.CurrencyMatchValidator;
-import com.ehb.banking.PaymentValidator;
-import com.ehb.banking.PositiveAmountValidator;
-import com.ehb.banking.SufficientFundsValidator;
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Currency;
+import com.ehb.banking.validation.CompositePaymentValidator;
+import com.ehb.banking.validation.CurrencyMatchValidator;
+import com.ehb.banking.validation.PaymentValidator;
+import com.ehb.banking.validation.PositiveAmountValidator;
+import com.ehb.banking.validation.SufficientFundsValidator;
 
 
 @Component

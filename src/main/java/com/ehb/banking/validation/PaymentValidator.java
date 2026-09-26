@@ -1,4 +1,7 @@
-package com.ehb.banking;
+package com.ehb.banking.validation;
+
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Payment;
 
 public interface PaymentValidator {
     /**

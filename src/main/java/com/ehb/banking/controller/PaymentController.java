@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ehb.banking.Payment;
+import com.ehb.banking.domain.Payment;
 import com.ehb.banking.dto.PaymentRequest;
 import com.ehb.banking.dto.PaymentResponse;
 import com.ehb.banking.service.PaymentService;

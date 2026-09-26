@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
 
-import com.ehb.banking.Payment;
+import com.ehb.banking.domain.Payment;
 
 
 

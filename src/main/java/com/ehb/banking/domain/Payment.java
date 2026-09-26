@@ -1,4 +1,4 @@
-package com.ehb.banking;
+package com.ehb.banking.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

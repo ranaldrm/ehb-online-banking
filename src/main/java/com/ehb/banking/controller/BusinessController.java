@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ehb.banking.Business;
+import com.ehb.banking.domain.Business;
 import com.ehb.banking.dto.AccountResponse;
 import com.ehb.banking.dto.BusinessResponse;
 import com.ehb.banking.service.BusinessService;

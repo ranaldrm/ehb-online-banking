@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ehb.banking.Account;
-import com.ehb.banking.Transaction;
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Transaction;
 import com.ehb.banking.dto.AccountResponse;
 import com.ehb.banking.dto.DepositRequest;
 import com.ehb.banking.dto.TransactionResponse;
-import com.ehb.banking.service.AccountService;
 import com.ehb.banking.dto.WithdrawRequest;
-
+import com.ehb.banking.service.AccountService;
 
 import jakarta.validation.Valid;
 

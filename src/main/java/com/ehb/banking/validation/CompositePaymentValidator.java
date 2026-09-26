@@ -1,6 +1,9 @@
-package com.ehb.banking;
+package com.ehb.banking.validation;
 
 import java.util.List;
+
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Payment;
 
 /**
  * Runs a sequence of {@link PaymentValidator}s in order.

@@ -3,9 +3,9 @@ package com.ehb.banking.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.ehb.banking.Currency;
-import com.ehb.banking.Payment;
-import com.ehb.banking.PaymentStatus;
+import com.ehb.banking.domain.Currency;
+import com.ehb.banking.domain.Payment;
+import com.ehb.banking.domain.PaymentStatus;
 
 
 

@@ -1,4 +1,4 @@
-package com.ehb.banking;
+package com.ehb.banking.domain;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.ehb.banking.exceptions.BankingException;
 import com.ehb.banking.exceptions.ExceedsBalanceException;
 import com.ehb.banking.exceptions.NonPositiveAmountException;
+import com.ehb.banking.validation.PaymentValidator;
 
 public class Account {
         

@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.ehb.banking.Account;
-import com.ehb.banking.Business;
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Business;
 import com.ehb.banking.exceptions.BusinessNotFoundException;
 import com.ehb.banking.repository.BusinessRepository;
 

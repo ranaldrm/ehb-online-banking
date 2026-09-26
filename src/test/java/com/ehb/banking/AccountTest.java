@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Currency;
+import com.ehb.banking.domain.TransactionType;
 import com.ehb.banking.exceptions.ExceedsBalanceException;
 import com.ehb.banking.exceptions.NonPositiveAmountException;
 

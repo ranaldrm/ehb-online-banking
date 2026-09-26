@@ -2,8 +2,8 @@ package com.ehb.banking.dto;
 
 import java.math.BigDecimal;
 
-import com.ehb.banking.Account;
-import com.ehb.banking.Currency;
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Currency;
 
 
 public record AccountResponse (

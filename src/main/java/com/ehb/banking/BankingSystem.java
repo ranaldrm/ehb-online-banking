@@ -3,6 +3,15 @@ package com.ehb.banking;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.ehb.banking.domain.Account;
+import com.ehb.banking.domain.Currency;
+import com.ehb.banking.domain.Payment;
+import com.ehb.banking.validation.CompositePaymentValidator;
+import com.ehb.banking.validation.CurrencyMatchValidator;
+import com.ehb.banking.validation.PaymentValidator;
+import com.ehb.banking.validation.PositiveAmountValidator;
+import com.ehb.banking.validation.SufficientFundsValidator;
+
 public class BankingSystem {
     public static void main (String[] args){
 

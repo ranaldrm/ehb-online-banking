@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.ehb.banking.Business;
+import com.ehb.banking.domain.Business;
 
 
 

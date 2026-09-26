@@ -1,4 +1,4 @@
-package com.ehb.banking;
+package com.ehb.banking.domain;
 
 public enum PaymentStatus {
     // enum constants are listed here:

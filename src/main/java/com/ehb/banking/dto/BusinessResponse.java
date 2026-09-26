@@ -2,7 +2,7 @@ package com.ehb.banking.dto;
 
 import java.util.List;
 
-import com.ehb.banking.Business;
+import com.ehb.banking.domain.Business;
 
 public record BusinessResponse (
     String businessID,
