@@ -16,6 +16,8 @@ import com.ehb.banking.dto.AccountResponse;
 import com.ehb.banking.dto.DepositRequest;
 import com.ehb.banking.dto.TransactionResponse;
 import com.ehb.banking.service.AccountService;
+import com.ehb.banking.dto.WithdrawRequest;
+
 
 import jakarta.validation.Valid;
 
@@ -44,9 +46,15 @@ public class AccountController {
                             .toList();      
     }
 
-    @PostMapping
-    public TransactionResponse deposit(@Valid @RequestBody DepositRequest depositRequest) {
-        Transaction transaction = accountService.deposit(depositRequest.accountNumber(), depositRequest.depositAmount());
+    @PostMapping("/{accountNumber}/deposit")
+    public TransactionResponse deposit(@PathVariable(value="accountNumber") String accountNumber, @Valid @RequestBody  DepositRequest depositRequest) {
+        Transaction transaction = accountService.deposit(accountNumber, depositRequest.depositAmount());
+        return TransactionResponse.from(transaction);
+    }
+
+    @PostMapping("/{accountNumber}/withdraw")
+    public TransactionResponse withdraw(@PathVariable(value="accountNumber") String accountNumber, @Valid @RequestBody  WithdrawRequest withdrawRequest) {
+        Transaction transaction = accountService.withdraw(accountNumber, withdrawRequest.withdrawAmount());
         return TransactionResponse.from(transaction);
     }
 

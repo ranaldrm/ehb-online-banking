@@ -43,5 +43,11 @@ public class AccountService {
     }
 
 
+    public Transaction withdraw(String accountNumber, BigDecimal amount){
+        Account account = getAccountByNumber(accountNumber);
+        return account.withdraw(amount);
+    }
+
+
 
 }

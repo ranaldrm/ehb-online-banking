@@ -81,7 +81,7 @@ public class Account {
 
     }
 
-    public void withdraw(BigDecimal amount){
+    public Transaction withdraw(BigDecimal amount){
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
             throw new NonPositiveAmountException("Withdrawal amount must be greater than 0");
@@ -94,6 +94,7 @@ public class Account {
         this.transactions.add(transaction);      
 
         this.balance = this.balance.subtract(amount);
+        return transaction;
         
     }
 
