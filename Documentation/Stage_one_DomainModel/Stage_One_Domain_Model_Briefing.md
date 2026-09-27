@@ -2,7 +2,7 @@ Let me read the codebase to give an accurate briefing.Here's a full briefing on 
 
 ---
 
-## EHB Online Banking — Domain Model State Briefing
+## Stage 1 COMPLETE — EHB Online Banking Domain Model State Briefing
 
 ### Purpose of this document
 
