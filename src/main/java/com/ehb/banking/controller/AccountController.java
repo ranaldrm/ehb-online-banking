@@ -57,6 +57,11 @@ public class AccountController {
         return TransactionResponse.from(transaction);
     }
 
+    @GetMapping()
+    public List<AccountResponse> getAllAccounts(){
+        return accountService.getAllAccounts().stream().map(AccountResponse::from).toList();
+    }
+ 
 
 
 }

@@ -2,9 +2,9 @@
 
 ## Project & Study Briefing
 
-**Status:** Active learning project\
+**Status:** Active learning project — Stage 2 complete; Stage 2.5 next\
 **Target Java version:** Java 21 (LTS)\
-**New job start date:** 21 September 2026\
+**Current date context:** late September 2026\
 **Repository:** `ehb-online-banking`
 
 ------------------------------------------------------------------------
@@ -107,7 +107,9 @@ Docker
 AWS
 ```
 
-A frontend could be added later, but it is not currently a priority.
+A deliberately minimal frontend is now planned immediately after the Spring Boot / REST stage and before persistence. It is a small learning interlude rather than a major frontend-development stage.
+
+The frontend should use **plain HTML and vanilla JavaScript only**, with **no CSS**, frontend framework, Node/npm toolchain, Thymeleaf, Bootstrap, or frontend build system. Its purpose is to make the existing REST capabilities usable from a browser with the least possible additional effort.
 
 ------------------------------------------------------------------------
 
@@ -362,6 +364,29 @@ GET  /payments/{id}
 POST /payments/{id}/approve
 ```
 
+### Stage 2.5 --- minimal browser UI
+
+A very small static browser interface sits in front of the existing REST API:
+
+``` text
+Browser (HTML + vanilla JavaScript)
+      ↓ fetch()
+Existing REST API
+      ↓
+Controller → Service → Repository / Domain model
+```
+
+The UI should expose the capabilities already available through the REST API rather than introduce new banking functionality. It should allow a user to select seeded businesses/accounts rather than requiring IDs to be copied manually, view account information and transaction history, deposit, withdraw, make payments, and check application status.
+
+Two small collection endpoints may be added to support selection controls:
+
+``` text
+GET /api/accounts
+GET /api/businesses
+```
+
+Keep the interface intentionally plain. Browser-default HTML controls are sufficient. The purpose is to practise basic browser/HTTP interaction (`fetch`, JSON, events, DOM updates) and to reinforce the REST boundary, not to learn visual frontend development.
+
 ### Stage 3 --- persistence
 
 JPA repositories and PostgreSQL store the fictional state:
@@ -563,59 +588,68 @@ and monitored.
 
 ------------------------------------------------------------------------
 
-## 16. Current study schedule
+## 16. Current project state and revised progression
 
-The confirmed job start date is **21 September 2026**.
+The original pre-job calendar has now served its purpose and should no longer be treated as the active schedule. Progress should be driven by understanding and available study time rather than the old August/September dates.
 
-The plan should remain flexible rather than treating dates as hard
-deadlines.
+Current state:
 
-### 20--23 August
+- **Stage 1 — COMPLETE:** plain Java domain model and JUnit tests.
+- **Stage 2 — COMPLETE:** Spring Boot + REST API, service/repository/DTO layers, validation, exception handling, and web-layer tests. Storage is still entirely in memory.
+- **Stage 2.5 — NEXT:** minimal HTML/vanilla-JavaScript UI over the existing REST API.
+- **Stage 3:** JPA + PostgreSQL + further testing.
+- **Stage 4:** microservices + Kafka.
+- **Stage 5:** Docker + AWS + consolidation.
 
-**Java 21 refresh + domain model**
+The intended progression is now:
 
-Goal: regain Java fluency and establish the first plain-Java EHB model.
+``` text
+Stage 1 — Plain Java domain model
+        COMPLETE
+            ↓
+Stage 2 — Spring Boot + REST
+        COMPLETE
+            ↓
+Stage 2.5 — Minimal HTML/JavaScript UI
+            ↓
+Stage 3 — JPA + PostgreSQL + testing
+            ↓
+Stage 4 — Microservices + Kafka
+            ↓
+Stage 5 — Docker + AWS + consolidation
+```
 
-### 24--30 August
+### Stage 2.5 scope guardrails
 
-**Spring Boot + REST**
+The UI is intentionally low-effort and should remain a short interlude before persistence.
 
-Goal: turn the existing Java concepts into a Spring Boot REST
-application.
+Use:
 
-### 31 August--6 September
+- static HTML served by Spring Boot;
+- vanilla JavaScript;
+- browser `fetch()` calls to the existing REST API;
+- standard HTML forms, buttons, selects, tables/lists, and text output;
+- likely `src/main/resources/static/index.html` and a small `app.js`.
 
-**JPA + PostgreSQL + testing**
+Do **not** introduce:
 
-Goal: persist fictional EHB data and build confidence with Spring/JUnit
-testing.
+- CSS or visual-design work;
+- React, Vue, Angular, or another frontend framework;
+- Node.js, npm, bundlers, or a frontend build pipeline;
+- Thymeleaf or server-side templating;
+- Bootstrap or another UI framework;
+- authentication/security as part of this stage;
+- new banking features merely to make the UI more elaborate.
 
-### 7--13 September
+The UI should normally let the user choose available seeded businesses/accounts from simple selection controls rather than manually entering changing UUIDs or memorising account numbers. This may justify adding simple collection endpoints such as `GET /api/accounts` and `GET /api/businesses`.
 
-**Microservices + Kafka**
-
-Goal: understand service boundaries and basic event-driven
-communication.
-
-### 14--20 September
-
-**Docker + AWS + consolidation**
-
-Goal: understand the deployment environment and consolidate the most
-important Java/Spring concepts.
-
-### 21 September
-
-**Start new job**
-
-The roadmap does not need to be completely finished for the preparation
-to have succeeded.
+A key architectural learning objective is that Stage 3 should be able to replace in-memory repositories with JPA/PostgreSQL while leaving the browser UI largely unchanged, because the UI communicates through the REST API rather than directly with persistence.
 
 ------------------------------------------------------------------------
 
-## 17. Definition of success before starting
+## 17. Ongoing definition of success
 
-The objective is **not** mastery of every technology.
+The objective is **not** mastery of every technology or completion according to the original pre-job timetable.
 
 A successful preparation period means being able to:
 

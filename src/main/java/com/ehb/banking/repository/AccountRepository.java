@@ -58,6 +58,10 @@ public class AccountRepository {
     public Optional<Account> findByAccountNumber(String accountNumber) {
         return Optional.ofNullable(this.accounts.get(accountNumber));
     }
+
+    public List<Account> findAll(){
+        return accounts.values().stream().toList();
+    }
     
 
 

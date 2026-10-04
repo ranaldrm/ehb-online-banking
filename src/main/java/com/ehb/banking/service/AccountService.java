@@ -32,6 +32,10 @@ public class AccountService {
         
     }
 
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
+    }
+
     public List<Transaction> getTransactionHistory(String accountNumber){
         return getAccountByNumber(accountNumber).getTransactions();
     }
