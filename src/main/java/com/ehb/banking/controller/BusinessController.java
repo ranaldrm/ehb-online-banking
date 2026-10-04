@@ -37,6 +37,10 @@ public class BusinessController {
         
     }
 
+    @GetMapping()
+    public List<BusinessResponse> getAllAccounts(){
+        return businessService.getAllBusinesses().stream().map(BusinessResponse::from).toList();
+    }
 
 
 

@@ -1,5 +1,6 @@
 package com.ehb.banking.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -26,6 +27,10 @@ public class BusinessService {
     public Map<String,Account> getAccountsForBusiness(String id) {
         return getBusinessByID(id).getAllAccounts();
         
+    }
+
+    public List<Business> getAllBusinesses(){
+        return businessRepository.findAll();
     }
 
 }

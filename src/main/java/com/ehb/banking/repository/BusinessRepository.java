@@ -1,6 +1,7 @@
 package com.ehb.banking.repository;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,6 +51,12 @@ public class BusinessRepository {
     public Optional<Business> getBusinessByID (String id){
         return Optional.ofNullable(this.businesses.get(id));
     }
+
+        public List<Business> findAll(){
+        return businesses.values().stream().toList();
+    }
+
+    
 
     
 }
