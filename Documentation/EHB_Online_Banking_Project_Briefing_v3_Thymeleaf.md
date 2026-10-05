@@ -364,28 +364,103 @@ GET  /payments/{id}
 POST /payments/{id}/approve
 ```
 
-### Stage 2.5 --- minimal browser UI
+### Stage 2.5 — Minimal Spring MVC + Thymeleaf UI
 
-A very small static browser interface sits in front of the existing REST API:
+Stage 2.5 adds a deliberately small browser interface before persistence is
+introduced. The purpose is **not** to begin a frontend-development curriculum.
+The UI exists to make the application convenient to use while reinforcing
+Spring MVC concepts that are relevant to the wider Java/Spring learning goals.
 
-``` text
-Browser (HTML + vanilla JavaScript)
-      ↓ fetch()
-Existing REST API
-      ↓
-Controller → Service → Repository / Domain model
+The UI technology is:
+
+- Spring MVC;
+- Thymeleaf;
+- plain HTML;
+- ordinary HTML forms and links.
+
+The existing REST API remains in place. The application therefore has two
+presentation paths over the same service/domain logic:
+
+```text
+REST client → @RestController → Service → Repository / Domain → JSON
+
+Browser → @Controller → Service → Repository / Domain
+                    ↓
+                  Model
+                    ↓
+                Thymeleaf
+                    ↓
+                   HTML
 ```
 
-The UI should expose the capabilities already available through the REST API rather than introduce new banking functionality. It should allow a user to select seeded businesses/accounts rather than requiring IDs to be copied manually, view account information and transaction history, deposit, withdraw, make payments, and check application status.
+The Thymeleaf UI should allow the user to perform the useful operations already
+supported by the application:
 
-Two small collection endpoints may be added to support selection controls:
+- see that the application is running;
+- browse the seeded businesses;
+- browse/select the seeded accounts;
+- view an account and its current balance;
+- view transaction history;
+- deposit money;
+- withdraw money;
+- make payments between accounts;
+- view a business and its accounts.
 
-``` text
-GET /api/accounts
-GET /api/businesses
-```
+The UI controller should normally call the existing service layer directly.
+It should **not** make HTTP requests back into the application's own REST API
+merely to reuse REST endpoints. Both `@Controller` and `@RestController` are
+presentation-layer adapters over the same services.
 
-Keep the interface intentionally plain. Browser-default HTML controls are sufficient. The purpose is to practise basic browser/HTTP interaction (`fetch`, JSON, events, DOM updates) and to reinforce the REST boundary, not to learn visual frontend development.
+### Stage 2.5 learning goals
+
+Use the small UI to understand:
+
+- `@Controller` versus `@RestController`;
+- Spring MVC `Model`;
+- Thymeleaf templates and expressions;
+- `th:text`;
+- `th:each`;
+- `th:href`;
+- simple conditional rendering where needed;
+- ordinary HTML forms;
+- Spring MVC form/request binding;
+- POST/Redirect/GET;
+- redirects after state-changing operations;
+- reusing the same service layer from REST and server-rendered UI controllers.
+
+Thymeleaf itself is a supporting skill rather than a major project objective.
+Learn only the subset required to build this UI.
+
+### Stage 2.5 scope limits
+
+Keep this stage deliberately small.
+
+Do **not** introduce:
+
+- CSS;
+- JavaScript for normal UI behaviour;
+- React, Vue, Angular, Svelte, or another frontend framework;
+- npm or Node.js;
+- Bootstrap or another UI toolkit;
+- a frontend build system;
+- authentication or login;
+- Spring Security;
+- JPA/PostgreSQL before Stage 3;
+- new banking functionality merely to make the UI more impressive.
+
+The interface can be visually crude. Browser-default HTML controls are
+sufficient.
+
+If collection REST endpoints such as `GET /api/accounts` or
+`GET /api/businesses` were already added while beginning the earlier
+JavaScript-oriented UI plan, they may remain as legitimate REST capabilities.
+The Thymeleaf UI does not need to call them internally.
+
+The UI work is complete once the existing banking operations can be performed
+conveniently in the browser, the existing REST API still works, and the main
+Spring MVC/Thymeleaf concepts above are understood. Do not continue polishing
+the frontend after those goals are met.
+
 
 ### Stage 3 --- persistence
 
@@ -610,7 +685,7 @@ Stage 1 — Plain Java domain model
 Stage 2 — Spring Boot + REST
         COMPLETE
             ↓
-Stage 2.5 — Minimal HTML/JavaScript UI
+Stage 2.5 — Minimal Spring MVC + Thymeleaf UI
             ↓
 Stage 3 — JPA + PostgreSQL + testing
             ↓

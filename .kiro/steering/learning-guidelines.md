@@ -61,13 +61,13 @@ In particular, explain concepts such as:
 Use current Spring Boot practices compatible with Java 21.
 
 ## Stage
-The project is currently at stage 2. Relevant documentation at this stage: the overall project briefing is at /home/ranaldrm/Projects/ehb-online-banking/Documentation/EHB_Online_Banking_Project_Briefing.md
+The project is currently at stage 2.5 (Thymeleaf front end). Relevant documentation at this stage: the overall project briefing is at Documentation/EHB_Online_Banking_Project_Briefing_v3_Thymeleaf.md
 
-The specific stage 2 briefing is at: /home/ranaldrm/Projects/ehb-online-banking/Documentation/Stage_two_Springboot_REST/EHB_Stage_2_Spring_Boot_REST_Briefing.md
+The tickets for stage 2.5 are at: Documentation/Stage_two_point_5_frontend/EHB_Stage_2_5_Thymeleaf_UI_Tickets.md
 
-The tickets for stage 2 are at: /home/ranaldrm/Projects/ehb-online-banking/Documentation/Stage_two_Springboot_REST/EHB_Stage_2_Guided_Implementation_Tickets.md
+Stage 2 (Spring Boot REST) is complete. Its documentation remains available for reference under Documentation/Stage_two_Springboot_REST/ (briefing, tickets, and state briefing).
 
-Right not you can ignore everything under the Stage_one_DomainModel folder.
+You can ignore everything under the Stage_one_DomainModel folder.
 
 ## Override Mode
 
