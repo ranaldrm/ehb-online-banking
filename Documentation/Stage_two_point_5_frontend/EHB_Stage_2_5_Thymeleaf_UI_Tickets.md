@@ -1,6 +1,6 @@
 # EHB Stage 2.5 — Minimal Thymeleaf UI
 
-## Ticket Pack
+## Ticket Pack (Beginner-Friendly Edition)
 
 **Project:** Edinburgh Hanoverian Bank (EHB) Online Banking  
 **Stage:** 2.5 — Minimal server-rendered browser UI  
@@ -8,17 +8,25 @@
 **UI technology:** Spring MVC + Thymeleaf + plain HTML  
 **Technology constraint:** **No CSS and no JavaScript unless a later requirement genuinely makes a tiny amount unavoidable.**
 
+> **If you have never used Thymeleaf before, start here.** This pack assumes no
+> prior frontend/template experience. Every ticket has a *"Background for
+> beginners"* box that teaches the new concept in plain language, and a *worked
+> example* you can study. The worked examples deliberately use a **different,
+> made-up scenario** (products, orders, warehouses) rather than the real EHB
+> accounts — that way you learn the pattern but still write the actual banking
+> code yourself, which is the whole point of this learning project.
+
 ---
 
 ## 1. Purpose of this stage
 
 Stage 2.5 adds a deliberately small browser interface to the existing Spring Boot application before persistence is introduced.
 
-The original Stage 2.5 plan used plain HTML plus JavaScript `fetch()` calls. That approach has been replaced because learning JavaScript from scratch would be a larger detour from the main purpose of EHB: learning Java, Spring Boot, backend development, persistence, and related enterprise technologies.
+An earlier Stage 2.5 plan used plain HTML plus JavaScript `fetch()` calls. That approach has been replaced: learning JavaScript from scratch would be a large detour from the main purpose of EHB, which is learning Java, Spring Boot, backend development, persistence, and related enterprise technologies.
 
-The revised UI should therefore reinforce **Spring MVC** rather than introduce a separate frontend programming curriculum.
+The revised UI uses **Spring MVC + Thymeleaf** so that building the UI reinforces Spring itself rather than introducing a separate frontend programming curriculum.
 
-The UI should ultimately allow the user to perform the useful operations currently available through the application:
+The UI should ultimately allow the user to:
 
 - see that the application is running;
 - browse the seeded businesses;
@@ -115,414 +123,520 @@ Do not make Thymeleaf a large independent study topic. Learn only the small subs
 
 ---
 
-## 4. Important change from the abandoned JavaScript ticket plan
+## 4. What you already have (read this before TH-01)
 
-If you already completed backend collection endpoints such as:
+This stage is being started on a codebase that is further along than a blank
+project. A few facts that the tickets rely on:
 
-```text
-GET /api/accounts
-GET /api/businesses
-```
-
-keep them. They are legitimate REST capabilities and do not need to be removed.
-
-However, the Thymeleaf UI does **not** need to call those REST endpoints internally.
+- **Thymeleaf is already on the classpath.** `pom.xml` already contains
+  `spring-boot-starter-thymeleaf`, so TH-01 is about *verifying and
+  understanding* it, not adding it.
+- **A `UIController` already exists** at
+  `src/main/java/com/ehb/banking/controller/UIController.java`, annotated
+  `@Controller`, mapping `GET /` to the view `bankhome`. (Watch its `Model`
+  import — see TH-02/TH-03.)
+- **A `bankhome.html` template already exists** under
+  `src/main/resources/templates/`, currently containing only a bare heading.
+- **Seeded accounts** (stable account numbers): `1111` GBP £500, `2222` EUR 0,
+  `3333` USD 0, `4444` GBP £500, `5555` EUR 0.
+- **Seeded businesses** with **random UUID IDs** (they change every restart):
+  `Dodgy Dave's` (accounts 1111, 2222), `University of Brigadoon` (3333, 4444),
+  `workShy Consultants LLC` (5555).
+- **The services you will call:**
+  `AccountService` → `getAllAccounts()`, `getAccountByNumber(String)`,
+  `getTransactionHistory(String)`, `deposit(String, BigDecimal)`,
+  `withdraw(String, BigDecimal)`;
+  `BusinessService` → `getAllBusinesses()`, `getBusinessByID(String)`,
+  `getAccountsForBusiness(String)`;
+  `PaymentService` → `processPayment(String source, String target, BigDecimal amount)`.
+- **The display records (and their exact field names):**
+  `AccountResponse{ accountNumber, currency, balance }`;
+  `TransactionResponse{ identifier, transactionType, transactionAmount, timestamp }`
+  (note `transactionAmount`, not `amount`);
+  `BusinessResponse{ businessID, businessName, accounts }`.
+- **Error handling:** `GlobalExceptionHandler` is a `@RestControllerAdvice`, so
+  it produces JSON. It will **not** render HTML error pages for the UI — TH-10
+  addresses that separately.
 
 The UI controller may call the existing **service layer directly**:
 
 ```text
-UI Controller → Service
+UI Controller  → Service
 REST Controller → Service
 ```
 
-This is not bypassing the application's architecture. Both controllers are presentation-layer adapters over the same application services.
-
-Do **not** make the Spring server send HTTP requests to its own REST API merely to reuse an endpoint.
+Both controllers are presentation-layer adapters over the same application
+services. Do **not** make the server send HTTP requests to its own REST API just
+to reuse an endpoint.
 
 ---
 
 ## 5. Learning approach
 
-These tickets are intentionally guided.
-
+These tickets are intentionally guided, but they are **not** finished solutions.
 For each ticket:
 
-1. inspect the named existing code first;
-2. understand the new Spring/Thymeleaf concept before using it;
-3. implement the important code yourself;
-4. use hints rather than requesting a complete implementation where possible;
+1. read the *Background for beginners* box;
+2. study the *worked example* (which uses a different, made-up scenario);
+3. inspect the named existing EHB code;
+4. implement the real EHB version yourself;
 5. manually verify the browser behaviour;
 6. run `mvn test` after meaningful backend changes;
 7. keep the UI ugly and small.
 
-The aim is not to become a Thymeleaf specialist. The aim is to learn a useful slice of Spring MVC while obtaining a convenient UI.
+The aim is not to become a Thymeleaf specialist. The aim is to learn a useful
+slice of Spring MVC while obtaining a convenient UI.
 
 ---
 
-# EHB Ticket TH-01 — Add Thymeleaf to the Project
+# EHB Ticket TH-01 — Get Ready for Thymeleaf
 
 ## Objective
 
-Add Thymeleaf support to the existing Spring Boot application and confirm that the project still builds and all existing tests pass.
+Make sure the project can serve server-rendered HTML pages with Thymeleaf, and
+confirm the application still builds and all existing tests pass.
 
-## Existing code/files to inspect
+## Background for beginners
 
-Before editing anything, inspect:
+**What is a server-rendered page?** So far EHB only speaks JSON: a tool like
+Postman sends a request and a `@RestController` returns raw data. A human in a
+browser wants a *web page* (HTML) instead. "Server-rendered" means the Java
+server builds the finished HTML itself and sends the whole document; the browser
+just displays it. No JavaScript, no second API call.
 
-- `pom.xml`;
-- the existing Spring Boot dependencies;
-- `EhbBankingApplication`;
-- the current `src/main/resources` directory.
+**What is Thymeleaf?** A template engine. A template is an HTML file with a few
+special `th:` attributes. On each request Spring hands your data to Thymeleaf,
+which fills the gaps and produces plain HTML:
 
-## Requirements
+```text
+template (HTML with gaps)  +  Java data  =  finished HTML
+```
 
-1. Add the appropriate Spring Boot Thymeleaf starter dependency.
-2. Do not remove `spring-boot-starter-web`.
-3. Do not change the existing REST controllers.
-4. Run the full test suite.
-5. Start the application and confirm the existing REST endpoints still work.
+**What is a starter?** A single Maven dependency bundling version-matched
+libraries. `spring-boot-starter-web` serves HTTP + REST;
+`spring-boot-starter-thymeleaf` adds the engine plus the glue so Spring MVC uses
+it automatically. That automatic wiring is **auto-configuration**: when Boot
+sees Thymeleaf on the classpath at startup it creates the view resolver for you.
 
-## Concepts being practised
+## Steps
 
-- Maven dependencies;
-- Spring Boot starters;
-- auto-configuration;
-- adding a server-side template engine to an existing Spring MVC application.
+1. **Inspect first:** `pom.xml`, `EhbBankingApplication`, and
+   `src/main/resources`.
+2. **Check for the starter.** Search `pom.xml` for:
+
+   ```xml
+   <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-thymeleaf</artifactId>
+   </dependency>
+   ```
+
+   In this project it is **probably already present** — confirm it, and confirm
+   `spring-boot-starter-web` is still there too. Only add the block (no
+   `<version>`) if it is genuinely missing.
+3. **Do not touch the REST controllers.**
+4. **Verify:**
+
+   ```bash
+   mvn test
+   mvn spring-boot:run
+   ```
+
+   Then confirm `GET http://localhost:8080/api/status` still returns
+   `Hello, from Edinburgh Hanoverian Bank`. Do not build any UI yet.
 
 ## Questions you should be able to answer
 
-- What does a Spring Boot starter provide?
-- Why does adding Thymeleaf not require manually constructing a template engine?
-- Why do the REST endpoints continue to work?
+- What does the Thymeleaf starter give you?
+- Why don't you build a template engine by hand?
+- Why do the `/api/...` endpoints keep working?
 
-## Verification
+## Done when
 
-Run:
-
-```bash
-mvn test
-```
-
-Then start the application and verify at least one existing endpoint, for example:
-
-```text
-GET /api/status
-```
-
-Do not create the UI yet.
+Both `spring-boot-starter-web` and `spring-boot-starter-thymeleaf` are present,
+`mvn test` is green, and `/api/status` still works.
 
 ---
 
-# EHB Ticket TH-02 — Render the First Thymeleaf Page
+# EHB Ticket TH-02 — Render Your First Thymeleaf Page
 
 ## Objective
 
-Create the simplest possible server-rendered EHB page.
+Create the simplest possible server-rendered EHB page: HTML with a heading,
+served by a `@Controller`. No banking data yet.
 
-The page does not need banking functionality yet.
+## Background for beginners
 
-## New concepts
-
-This ticket introduces:
-
-- `@Controller`;
-- a controller method returning a view name;
-- `src/main/resources/templates`;
-- a Thymeleaf HTML template.
-
-## Requirements
-
-1. Create a new UI controller in an appropriate controller package.
-2. Annotate it with `@Controller`, **not** `@RestController`.
-3. Add a GET route for the main UI, for example `/` or `/banking`.
-4. Create a corresponding HTML template under:
+**`@RestController` vs `@Controller`.** On a `@RestController`, returning a
+`String` sends that exact text as the response body. On a plain `@Controller`,
+returning a `String` names a **view** (a template to render):
 
 ```text
-src/main/resources/templates/
+@RestController + return "x"  →  client receives the text "x"
+@Controller     + return "x"  →  client receives templates/x.html rendered as HTML
 ```
 
-5. The page should contain an `EHB Online Banking` heading.
-6. No CSS.
-7. No JavaScript.
+**Where templates live:** `src/main/resources/templates/`. The view name
+`"bankhome"` maps to `templates/bankhome.html`.
 
-## Important comparison
-
-Compare these two ideas:
-
-```java
-@RestController
-```
-
-and:
+## Worked example (a different page, so you still write the EHB one)
 
 ```java
 @Controller
+public class GreetingController {
+    @GetMapping("/hello")
+    public String hello() {
+        return "greeting"; // -> templates/greeting.html
+    }
+}
 ```
 
-Your existing REST controllers return response data. The new UI controller should return a **view name** that Spring resolves to a Thymeleaf template.
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Greeting</title></head>
+<body>
+    <h1>Hello there</h1>
+</body>
+</html>
+```
 
-## Starting hint
+The `xmlns:th` namespace is what makes `th:...` attributes work later; add it now.
 
-The controller method does not need to retrieve any banking data yet.
+## Your task
 
-Think about what a returned string such as a template name means when the class is a normal `@Controller`.
+1. Read the existing `UIController` (`@Controller`, `GET /` → `bankhome`).
+2. Open the existing `bankhome.html` (currently just a bare `<h1>`).
+3. Flesh it into a full document: `<!DOCTYPE html>`, an
+   `<html xmlns:th="http://www.thymeleaf.org">` root, a `<head><title>`, and a
+   `<body>` with `<h1>EHB Online Banking</h1>`. No CSS, no JavaScript.
 
-## Verification
+> **Likely bug to watch for.** Check `UIController`'s `Model` import. The correct
+> type is `org.springframework.ui.Model`; an IDE may have imported a different
+> `Model` (e.g. from a logging library). You don't use `Model` yet, but you will
+> in TH-03 — fix it to `org.springframework.ui.Model` (or remove the unused
+> import and re-add the right one in TH-03).
 
-Start the application and visit the UI route in a browser.
+## Verify
 
-You should see ordinary HTML generated from the Thymeleaf template.
+Visit `http://localhost:8080/`; see the heading. "View page source" should show
+plain HTML with no `th:` attributes. Confirm `/api/status` still responds.
 
-Confirm that `/api/...` routes still behave as REST endpoints.
+## Done when
+
+`/` shows an HTML page with the heading, the source is plain HTML, and REST is
+unaffected.
 
 ---
 
-# EHB Ticket TH-03 — Pass Data Through the Spring MVC Model
+# EHB Ticket TH-03 — Pass Data From Java Into the Page
 
 ## Objective
 
-Pass a small value from Java into the HTML page using Spring's MVC `Model` and Thymeleaf.
+Send one simple value from the controller into the page and display it with
+Thymeleaf. Just one string, to focus on the mechanism.
 
-This ticket deliberately uses a trivial value before introducing account collections.
+## Background for beginners
 
-## Requirements
+**The `Model` is a box of data for the page.** You add values by name:
 
-1. Add a `Model` parameter to the UI controller method.
-2. Put a simple value into the model, such as an application/page status message.
-3. Display that value in the Thymeleaf template using `th:text`.
-4. Do not hard-code the displayed value in the HTML.
-
-## Concepts being practised
-
-- Spring MVC `Model`;
-- model attributes;
-- server-side rendering;
-- Thymeleaf expressions;
-- `th:text`;
-- the lifecycle:
-
-```text
-Controller creates model data
-        ↓
-Spring passes model to Thymeleaf
-        ↓
-Thymeleaf renders HTML
-        ↓
-browser receives finished HTML
+```java
+model.addAttribute("pageStatus", "All systems go");
 ```
 
-## Reflection question
+**`th:text` writes a value into an element:**
 
-How is this different from the abandoned JavaScript approach, where the browser would load a page and then separately call an API with `fetch()`?
+```html
+<p th:text="${pageStatus}">placeholder text</p>
+```
 
-## Verification
+`${pageStatus}` reads the model attribute; `th:text` replaces the element's text
+with it at render time. The placeholder text only shows if you open the raw file
+directly — so you are not hard-coding the real value.
 
-Change the Java-side value temporarily and reload the browser.
+**Lifecycle:** controller puts data in the Model → Spring hands it to Thymeleaf →
+Thymeleaf fills the template → browser receives finished HTML. (Contrast the old
+JS plan, where the browser loaded an empty page and *then* fetched data.)
 
-The rendered page should reflect the Java-side value.
+## Worked example
+
+```java
+@GetMapping("/hello")
+public String hello(Model model) {
+    model.addAttribute("greeting", "Hello there");
+    return "greeting";
+}
+```
+
+```html
+<h1 th:text="${greeting}">placeholder heading</h1>
+```
+
+## Your task
+
+1. In `UIController.bankHome`, confirm the `Model` import is
+   `org.springframework.ui.Model` (fix if not).
+2. Add a simple attribute (e.g. a status message) to the model.
+3. Display it in `bankhome.html` with `th:text` — do not type the literal text
+   into the HTML.
+
+## Verify
+
+The page shows the value. Change the value **in Java**, restart, reload — the
+page must reflect the change.
+
+## Reflection
+
+How does this differ from the old JavaScript approach (requests, where logic
+lives, what the browser must do)?
+
+## Done when
+
+The page shows a Java-originated value, changing the Java value changes the page,
+and nothing is hard-coded in the HTML.
 
 ---
 
-# EHB Ticket TH-04 — Display All Accounts
+# EHB Ticket TH-04 — Display All Accounts in a Table
 
 ## Objective
 
-Use the existing account service to supply all accounts to the Thymeleaf page and display them.
+Show every seeded account on a page, in a plain HTML table, using real data from
+`AccountService`.
 
-## Existing code to inspect
+## Background for beginners
 
-Review:
-
-- `AccountService`;
-- `AccountRepository`;
-- `AccountResponse`;
-- any `getAllAccounts`/collection method you added while starting the previous UI plan.
-
-If you already completed the REST `GET /api/accounts` work, reuse the **service capability**, not the REST controller.
-
-## Requirements
-
-1. The UI controller obtains the account collection through `AccountService`.
-2. Do not access `AccountRepository` directly from the controller.
-3. Add the account collection to the MVC model.
-4. Render all accounts in the template using Thymeleaf iteration.
-5. Display at least:
-   - account number;
-   - currency;
-   - balance.
-6. A plain HTML table or list is sufficient.
-
-## Thymeleaf concept
-
-Investigate:
+**Go through the service, not the repository:**
 
 ```text
-th:each
+UIController → AccountService → AccountRepository
 ```
 
-Understand the idea before using it.
+Use the existing `List<Account> getAllAccounts()`. Map each `Account` to an
+`AccountResponse` (there is `AccountResponse.from(account)`), just like the REST
+side. `AccountResponse` fields: `accountNumber`, `currency`, `balance`.
 
-Conceptually:
+**`th:each` — the "for each" loop:**
 
-```text
-for each account in accounts
-    render this HTML element
+```html
+<tr th:each="item : ${items}">
+    <td th:text="${item.name}">name</td>
+</tr>
 ```
 
-## Architecture requirement
+"For each `item` in `items`, produce one `<tr>`." For a record,
+`${account.accountNumber}` calls the generated accessor automatically.
 
-Keep:
+## Worked example (a products table)
 
-```text
-UI Controller → AccountService → AccountRepository
+```java
+@GetMapping("/products")
+public String products(Model model) {
+    model.addAttribute("products",
+        productService.getAll().stream().map(ProductResponse::from).toList());
+    return "products";
+}
 ```
 
-Do not create a second account repository or duplicate seeded data for the UI.
+```html
+<table>
+    <tr><th>Name</th><th>Price</th></tr>
+    <tr th:each="product : ${products}">
+        <td th:text="${product.name}">name</td>
+        <td th:text="${product.price}">price</td>
+    </tr>
+</table>
+```
 
-## Verification
+The header row has no `th:each` (shown once); the data row repeats.
 
-Reload the page and confirm that all five seeded accounts appear.
+## Your task
 
-Restart the application and confirm the page obtains the data again from the backend.
+1. Read `AccountService.getAllAccounts()`, `AccountResponse`, and
+   `AccountController.getAllAccounts()`.
+2. In `UIController`, fetch and map accounts to `AccountResponse`, add the list
+   to the model.
+3. Render one row per account with `th:each`, showing account number, currency,
+   balance. A plain table/list is fine; no CSS. Do not inject
+   `AccountRepository` into the controller.
+
+## Verify
+
+All **five** accounts appear (1111 GBP 500, 2222 EUR 0, 3333 USD 0, 4444 GBP 500,
+5555 EUR 0). Restart and reload — the list reappears, proving it is read live.
+
+## Done when
+
+All five accounts render via the service, nothing hard-coded.
 
 ---
 
-# EHB Ticket TH-05 — Add Account Selection and an Account Details Page
+# EHB Ticket TH-05 — Click an Account to See Its Details
 
 ## Objective
 
-Allow the user to choose an account and navigate to a page showing its current details.
+Make each listed account a link to a per-account details page at `/accounts/1111`.
 
-## Suggested route shape
+## Background for beginners
 
-A natural UI route would be something like:
+**Dynamic URLs + `@PathVariable`:** the changing part of the URL is captured by a
+method parameter:
 
-```text
-GET /accounts/{accountNumber}
+```java
+@GetMapping("/accounts/{accountNumber}")
+public String accountDetails(@PathVariable String accountNumber, Model model) { ... }
 ```
 
-This is a **UI route**, distinct from the existing REST route under `/api/accounts/...`.
+Same tool your REST controller uses — the only difference is this returns a
+**view name**, not a DTO.
 
-You may choose another sensible UI route if it avoids ambiguity.
+**`th:href` builds links from data** with the `@{...}` URL syntax:
 
-## Requirements
+```html
+<a th:href="@{/accounts/{num}(num=${account.accountNumber})}">View</a>
+```
 
-1. Each account shown on the main page should provide a way to view that account.
-2. The account number should be included in the generated link.
-3. Add a UI controller method with a path variable.
-4. Use `AccountService` to retrieve the account.
-5. Put the required data into the model.
-6. Render an account-details template.
-7. Display at least:
-   - account number;
-   - currency;
-   - balance.
+For account `1111` this renders `href="/accounts/1111"`.
 
-## Concepts being practised
+**Looking one up:** `AccountService.getAccountByNumber(String)` (throws
+`AccountNotFoundException` if missing).
 
-- `@PathVariable` in an MVC controller;
-- dynamic links;
-- Thymeleaf `th:href`;
-- multiple templates;
-- retrieving current server state for a page.
+## Worked example (product details)
 
-## Important comparison
+```html
+<a th:href="@{/products/{id}(id=${product.id})}">View</a>
+```
 
-You already used `@PathVariable` in REST controllers.
+```java
+@GetMapping("/products/{id}")
+public String productDetails(@PathVariable String id, Model model) {
+    model.addAttribute("product", ProductResponse.from(productService.getById(id)));
+    return "product-details";
+}
+```
 
-Ask yourself what is the same and what is different when the controller returns a template rather than a DTO.
+## Your task
 
-## Verification
+1. Add a `th:href` link in each account row to `/accounts/{accountNumber}`.
+2. Add a `GET /accounts/{accountNumber}` method with a `@PathVariable`; look up
+   via the service, map to `AccountResponse`, add to the model, return a new
+   view (e.g. `account-details`).
+3. Create `account-details.html` showing account number, currency, balance.
 
-Navigate from the account list to several different accounts.
+## Verify
 
-The URL and displayed account should correspond.
+Clicking different accounts changes the URL and the shown account to match.
+(Account numbers are stable across restarts; business IDs in TH-07 are not.)
+
+## Done when
+
+Each account links to its own working details page; URL and content match.
 
 ---
 
-# EHB Ticket TH-06 — Display Transaction History
+# EHB Ticket TH-06 — Show the Transaction History
 
 ## Objective
 
-Display the selected account's transaction history on its account page.
+On the account details page, list that account's transactions; show
+"No transactions" when there are none.
 
-## Existing code to inspect
+## Background for beginners
 
-Review:
+Use `AccountService.getTransactionHistory(String)` and map each `Transaction` to
+`TransactionResponse` (`TransactionResponse.from(...)`).
 
-- `AccountService.getTransactionHistory(...)`;
-- `TransactionResponse`;
-- the existing REST transaction-history controller method.
+> **Exact field names** (not what you might guess): `identifier`,
+> `transactionType` (`INCOMING`/`OUTGOING`), **`transactionAmount`** (not
+> `amount`), `timestamp`. `${t.amount}` will fail.
 
-## Requirements
+**`th:if` / `th:unless`** show an element only when a condition is true/false:
 
-1. Retrieve the transaction history through the service layer.
-2. Add it to the model for the account-details page.
-3. Iterate over the transactions with Thymeleaf.
-4. Display useful fields such as:
-   - transaction type;
-   - amount;
-   - timestamp.
-5. If the collection is empty, display a simple message such as:
-
-```text
-No transactions
+```html
+<p th:if="${list.isEmpty()}">Nothing here</p>
+<table th:unless="${list.isEmpty()}"> ... </table>
 ```
 
-## Thymeleaf concepts
+## Worked example (order history)
 
-This ticket may introduce:
+```html
+<p th:if="${orders.isEmpty()}">No orders</p>
+<table th:unless="${orders.isEmpty()}">
+    <tr><th>Type</th><th>Amount</th><th>When</th></tr>
+    <tr th:each="order : ${orders}">
+        <td th:text="${order.type}">type</td>
+        <td th:text="${order.total}">total</td>
+        <td th:text="${order.placedAt}">when</td>
+    </tr>
+</table>
+```
 
-- another `th:each`;
-- `th:if` and/or `th:unless`.
+## Your task
 
-Do not try to learn all Thymeleaf conditional features. Use only what the page requires.
+1. In the account details method, also fetch and map the transaction history and
+   add it to the model.
+2. In `account-details.html`, show "No transactions" if empty, otherwise loop
+   with `th:each` showing `transactionType`, `transactionAmount`, `timestamp`.
 
-## Verification
+## Verify
 
-View accounts with different transaction histories and confirm the displayed data corresponds to backend state.
+`1111` and `4444` show one `INCOMING` row (the seeded £500). `2222`, `3333`,
+`5555` show the empty message. New rows appear after you build the forms.
+
+## Done when
+
+Accounts with history show rows; accounts without show a clear message.
 
 ---
 
-# EHB Ticket TH-07 — Display Businesses and Their Accounts
+# EHB Ticket TH-07 — Browse Businesses and Their Accounts
 
 ## Objective
 
-Add a simple business section/page that lets you browse the seeded businesses and see their accounts without manually copying their changing UUIDs.
+List the seeded businesses; click one to see its details and accounts.
 
-## Existing code to inspect
+## Background for beginners
 
-Review:
+Business IDs are **random UUIDs created at startup** (see `BusinessRepository`) —
+they change every restart, so you cannot hard-code them. The UI must list
+businesses and carry the current ID in each link (the TH-04/TH-05 pattern).
 
-- `BusinessService`;
-- `BusinessRepository`;
-- `BusinessResponse`;
-- any collection method added while beginning the previous UI plan.
+Services: `getAllBusinesses()`, `getBusinessByID(String)`,
+`getAccountsForBusiness(String)`. Map via `BusinessResponse.from(business)`;
+fields `businessID`, `businessName`, `accounts` (a `List<AccountResponse>`).
 
-## Requirements
+> **Security:** a `Business` has a plaintext `password`. `BusinessResponse`
+> omits it on purpose — never put it in the model or template.
+>
+> **Architecture:** inject `BusinessService`, not `BusinessRepository`.
 
-1. Obtain all businesses through `BusinessService`.
-2. Do not access `BusinessRepository` directly from the UI controller.
-3. Display the business names.
-4. Provide a way to view a selected business.
-5. The selected business page/section should show:
-   - business name;
-   - business ID;
-   - its accounts.
-6. The plaintext password must never be displayed.
+## Worked example (departments)
 
-## Concepts being practised
+```html
+<li th:each="dept : ${departments}">
+    <a th:href="@{/departments/{id}(id=${dept.id})}" th:text="${dept.name}">name</a>
+</li>
+```
 
-- multiple model collections;
-- UUIDs in routes;
-- reusing service-layer functionality from more than one presentation layer;
-- protecting fields at presentation boundaries.
+## Your task
 
-## Verification
+1. Read `BusinessService`, `BusinessResponse`, `BusinessController`.
+2. `GET /businesses` lists business names, each linking to `/businesses/{id}`
+   using the current `businessID`.
+3. `GET /businesses/{id}` shows name, ID, and its accounts (looped). Never show
+   the password.
 
-Restart the application so business UUIDs change.
+## Verify
 
-The UI should continue to work because it obtains the current IDs from backend data rather than hard-coding them.
+`/businesses` shows the three businesses; each links to the right accounts
+(Dodgy Dave's → 1111, 2222; University of Brigadoon → 3333, 4444; workShy
+Consultants LLC → 5555). **Restart** and repeat: IDs differ but navigation still
+works because IDs come from the listing, not from hard-coding.
+
+## Done when
+
+Businesses list and link through correctly, a restart doesn't break it, and the
+password is never shown.
 
 ---
 
@@ -530,71 +644,86 @@ The UI should continue to work because it obtains the current IDs from backend d
 
 ## Objective
 
-Allow a deposit to be made from the account page using a normal HTML form and a Spring MVC POST handler.
+Let the user deposit an amount from the account page via a plain HTML form and a
+POST handler. No JavaScript. (This is the biggest conceptual jump — read slowly.)
 
-No JavaScript is required.
+## Background for beginners
 
-## Target interaction
+**Forms send a POST:**
 
-Conceptually:
-
-```text
-Account page
-   ↓
-user enters amount
-   ↓
-HTML form POST
-   ↓
-UI controller
-   ↓
-AccountService.deposit(...)
-   ↓
-redirect to account page
-   ↓
-fresh balance/history displayed
+```html
+<form action="/some/path" method="post">
+    <input type="text" name="amount" />
+    <button type="submit">Go</button>
+</form>
 ```
 
-## Requirements
+Each `<input name="...">` becomes a form parameter in the request body.
 
-1. Add a plain HTML form to the account page.
-2. The form must identify:
-   - the account being changed;
-   - the deposit amount.
-3. Add an MVC POST handler for the form submission.
-4. Convert/bind the submitted amount into an appropriate Java type.
-5. Call the existing `AccountService.deposit(...)`.
-6. Do **not** duplicate deposit business logic in the controller.
-7. After success, redirect back to the account page.
-8. The refreshed page should show the new balance and transaction.
+**Read parameters with `@RequestParam`** (Spring converts types for you):
 
-## Concepts being practised
+```java
+@PostMapping("/some/path")
+public String handle(@RequestParam BigDecimal amount) { ... }
+```
 
-- HTML `<form>`;
-- `method="post"`;
-- form parameters;
-- `@RequestParam` or an appropriate simple form-binding technique;
-- POST/Redirect/GET;
-- `redirect:`;
-- reusing service/domain behaviour.
+(REST reads JSON via `@RequestBody`; an HTML form sends url-encoded fields read
+via `@RequestParam`. Both reach the same service.)
 
-## Important concept: POST/Redirect/GET
+**POST / Redirect / GET — you must use this.** After a successful change, return
+a redirect rather than rendering from the POST handler:
 
-Understand why returning a redirect after a successful mutation is preferable to simply rendering the same page directly from the POST handler.
+```java
+return "redirect:/accounts/" + accountNumber;
+```
 
-Consider what could happen if a browser refreshed a page whose last request was a POST.
+Why: if the POST handler rendered the page, a browser *refresh* would re-send the
+POST and deposit again. Redirecting to a GET makes refresh harmless.
 
-## Scope warning
+**The service call:** `accountService.deposit(accountNumber, amount)` — do not
+re-implement deposit rules in the controller.
 
-Do not create a complicated form DTO unless it genuinely improves clarity. This UI is deliberately small.
+## Worked example (a restock form)
 
-## Verification
+```html
+<form th:action="@{/products/{id}/restock(id=${product.id})}" method="post">
+    <input type="text" name="quantity" />
+    <button type="submit">Restock</button>
+</form>
+```
 
-1. Open an account page.
-2. Note the balance.
-3. Deposit a small amount.
-4. Confirm you are returned to the account page.
-5. Confirm the balance and transaction history changed.
-6. Refresh the page and make sure the deposit is **not** submitted again.
+```java
+@PostMapping("/products/{id}/restock")
+public String restock(@PathVariable String id, @RequestParam int quantity) {
+    productService.restock(id, quantity);
+    return "redirect:/products/" + id;
+}
+```
+
+The product/account is identified by the `@PathVariable`; the amount by a
+`@RequestParam`.
+
+## Your task
+
+1. Add a deposit `<form method="post">` to `account-details.html`, posting to
+   e.g. `/accounts/{accountNumber}/deposit` (build the action with `th:action`
+   + `@{...}`), with one amount input.
+2. Add a `@PostMapping` handler: account number as `@PathVariable`, amount as
+   `@RequestParam BigDecimal`, call `accountService.deposit(...)`, return a
+   `redirect:` to the account page.
+3. Don't duplicate deposit rules in the controller.
+
+> **Scope:** two `@RequestParam`s are clearer than a form DTO for one field.
+> Keep it small.
+
+## Verify
+
+On `1111` (500.00), deposit `50` → back on the page with `550.00` and a new
+`INCOMING` row. **Refresh** — it must not deposit again.
+
+## Done when
+
+Deposit updates balance/history, returns you to the GET page, and refresh is safe.
 
 ---
 
@@ -602,81 +731,112 @@ Do not create a complicated form DTO unless it genuinely improves clarity. This 
 
 ## Objective
 
-Allow a withdrawal from the account page using the same basic Spring MVC form pattern.
+Add a withdrawal form using the exact same pattern as the deposit form.
 
-## Requirements
+## Background for beginners
 
-1. Add a withdrawal form.
-2. Add a corresponding POST handler.
-3. Use `AccountService.withdraw(...)`.
-4. Redirect back to the account page after success.
-5. Do not reproduce sufficient-funds or positivity rules in the HTML/controller as the authoritative validation.
-6. Existing domain behaviour must remain responsible for banking rules.
+Same shape as TH-08: `form POST → @PostMapping → service → redirect → GET`. Only
+the call changes: `accountService.withdraw(accountNumber, amount)`.
 
-## Learning goal
+The domain owns the rules: non-positive → `NonPositiveAmountException`; over
+balance → `ExceedsBalanceException`. Do **not** re-check "enough money?" in the
+controller or fake the guard in HTML. A failed withdrawal will throw and produce
+an ugly page for now — TH-10 fixes error presentation.
 
-This ticket should feel substantially easier than TH-08.
+## Worked example
 
-Recognise the repeated pattern:
-
-```text
-form → controller POST → service → redirect → GET
+```html
+<form th:action="@{/accounts/{num}/withdraw(num=${account.accountNumber})}" method="post">
+    <input type="text" name="amount" />
+    <button type="submit">Withdraw</button>
+</form>
 ```
 
-Do not immediately build a generic form-processing abstraction simply because deposit and withdrawal look similar.
+```java
+@PostMapping("/accounts/{accountNumber}/withdraw")
+public String withdraw(@PathVariable String accountNumber, @RequestParam BigDecimal amount) {
+    accountService.withdraw(accountNumber, amount);
+    return "redirect:/accounts/" + accountNumber;
+}
+```
 
-## Verification
+## Your task
 
-Test:
+Add the withdrawal form and matching handler.
 
-- a valid withdrawal;
-- a withdrawal larger than the balance.
+> **Resist abstraction.** Deposit and withdraw look alike — do **not** build a
+> shared generic "form processor". Two small clear methods are better here.
 
-For the valid case, confirm the refreshed account page shows the changed state.
+## Verify
 
-The failure case will be improved in the next ticket.
+Valid: `1111` withdraw `100` → `400.00` + an `OUTGOING` row. Invalid: withdraw
+`99999` → ugly error for now (note it; TH-10 improves it), balance unchanged.
+
+## Done when
+
+Valid withdrawal updates state and returns to the page; invalid one leaves the
+balance intact.
 
 ---
 
-# EHB Ticket TH-10 — Show Simple Form Errors
+# EHB Ticket TH-10 — Show Friendly Form Errors
 
 ## Objective
 
-Make failed deposit/withdrawal operations understandable in the browser without creating a sophisticated error system.
+Turn a failed deposit/withdrawal into a short, readable HTML message instead of a
+stack trace or JSON.
 
-## Background
+## Background for beginners
 
-Your REST API already has `GlobalExceptionHandler`, but the Thymeleaf UI is a separate presentation path. A REST error response containing JSON is not a good user-facing HTML page.
+**Why the existing handler won't help:** `GlobalExceptionHandler` is a
+`@RestControllerAdvice` → it produces JSON, which is wrong for a browser page. So
+the HTML UI needs its own small handling. Do **not** change or remove the REST
+`GlobalExceptionHandler`.
 
-For this small UI, use the simplest understandable MVC approach.
+**Exceptions to catch** (both extend `BankingException`):
+`NonPositiveAmountException`, `ExceedsBalanceException`.
 
-## Requirements
+**Recommended approach — catch + flash attribute.** Because of
+POST/Redirect/GET, an ordinary model attribute is lost across the redirect; a
+**flash attribute** survives exactly one redirect:
 
-1. A domain error during a deposit or withdrawal should not leave the user staring at JSON or a generic server error page.
-2. Display a short error message on an HTML page.
-3. Keep domain rules in the domain/service layer.
-4. Do not duplicate exception-to-message logic throughout many controller methods if a very small shared MVC solution is clearer.
-5. Do not redesign the existing REST `GlobalExceptionHandler`.
-6. Keep the solution proportionate to this tiny UI.
+```java
+@PostMapping("/accounts/{accountNumber}/withdraw")
+public String withdraw(@PathVariable String accountNumber,
+                       @RequestParam BigDecimal amount,
+                       RedirectAttributes redirectAttributes) {
+    try {
+        accountService.withdraw(accountNumber, amount);
+    } catch (BankingException ex) {
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+    }
+    return "redirect:/accounts/" + accountNumber;
+}
+```
 
-## Concepts to investigate
+```html
+<p th:if="${error}" th:text="${error}">error message</p>
+```
 
-Depending on the implementation you choose, this may introduce one of:
+Alternatives: a tiny MVC `@ControllerAdvice` (not `@RestControllerAdvice`), or
+catch-and-re-render. Both are more machinery than this UI needs — ask before
+going bigger.
 
-- catching a known banking exception in a UI controller and re-rendering/redirecting appropriately;
-- a small MVC-oriented `@ControllerAdvice`;
-- redirect attributes / flash attributes.
+## Your task
 
-Ask for guidance before introducing a more elaborate mechanism.
+Make a failed deposit/withdrawal show a short message with the account state
+unchanged. Keep rules in the domain; only improve presentation. Don't touch the
+REST advice.
 
-## Verification
+## Verify
 
-Deliberately attempt:
+Non-positive amount (`0`/`-5`) and an over-balance withdrawal both show a
+readable message; balance unchanged; a later success doesn't still show the old
+error (flash attribute).
 
-- a non-positive amount;
-- a withdrawal exceeding the balance.
+## Done when
 
-The browser should display a useful message and remain usable.
+Both failures show a clear message, state stays valid, REST handling untouched.
 
 ---
 
@@ -684,176 +844,172 @@ The browser should display a useful message and remain usable.
 
 ## Objective
 
-Allow a user to make a payment between accounts using a server-rendered HTML form.
+A form that moves money between two accounts chosen from drop-downs built from
+real account data.
 
-## Existing code to inspect
+## Background for beginners
 
-Review:
-
-- `PaymentService`;
-- `PaymentRequest`;
-- `PaymentResponse`;
-- `PaymentController`;
-- the account collection already supplied to the UI.
-
-## Requirements
-
-The payment form should provide:
-
-- source-account selection;
-- target-account selection;
-- amount;
-- submit button.
-
-Use ordinary HTML `<select>` elements populated by Thymeleaf from backend account data.
-
-On submission:
-
-1. Spring receives the form fields;
-2. the UI controller obtains the submitted values;
-3. call the existing `PaymentService.processPayment(...)`;
-4. do not reproduce payment validation in the UI controller;
-5. after success, show a simple confirmation and/or redirect to an appropriate page;
-6. subsequent account pages must show the changed source and target balances/transactions.
-
-## Thymeleaf concepts
-
-This ticket reinforces:
-
-- `th:each` inside `<option>`;
-- `th:value`;
-- `th:text`;
-- server-generated form controls.
-
-## Important distinction
-
-The browser is submitting **form data**, not JSON.
-
-Be able to contrast:
-
-```text
-REST API:
-JSON → Jackson → PaymentRequest
-```
-
-with the simple MVC UI path:
-
-```text
-HTML form fields → Spring MVC binding → controller parameters → PaymentService
-```
-
-Both ultimately reach the same service/domain behaviour.
-
-## Verification
-
-Make a valid payment between compatible accounts.
-
-Confirm:
-
-- source balance decreases;
-- target balance increases;
-- transaction histories update.
-
-Also try a known failure such as insufficient funds or incompatible currencies and confirm the UI handles it sensibly.
-
----
-
-# EHB Ticket TH-12 — Add Simple Navigation and Consolidate the Templates
-
-## Objective
-
-Make the crude UI easy enough to move around without introducing styling or frontend complexity.
-
-## Requirements
-
-Add ordinary HTML links where useful, for example:
-
-- home;
-- accounts;
-- businesses;
-- back to selected account.
-
-Review the templates for obvious duplication and confusing structure.
-
-You may use a small amount of Thymeleaf template reuse **only if it clearly simplifies the project**.
-
-## Scope warning
-
-Do not turn this into a Thymeleaf-layout exercise.
-
-You do **not** need:
-
-- a template-layout library;
-- CSS;
-- navigation bars;
-- responsive design;
-- fragments for every repeated HTML element.
-
-Plain links such as:
+**Drop-downs from data:** `<select>` with one `<option>` per account, generated
+with `th:each`, value via `th:value`, label via `th:text`:
 
 ```html
-<a>Home</a>
+<select name="source">
+    <option th:each="acc : ${accounts}"
+            th:value="${acc.accountNumber}"
+            th:text="${acc.accountNumber + ' (' + acc.currency + ')'}"></option>
+</select>
 ```
 
-are sufficient.
+**Service:** `paymentService.processPayment(source, target, amount)`. Don't
+re-validate in the controller.
 
-## Concepts being practised
+**Contrast:** `JSON → Jackson → PaymentRequest → PaymentService` (REST) vs
+`form fields → @RequestParam → PaymentService` (UI). Same service.
 
-- server-generated links;
-- `th:href`;
-- keeping a small multi-page server-rendered application understandable;
-- resisting unnecessary abstraction.
+## Worked example (transfer-stock form)
 
-## Verification
+```java
+@GetMapping("/transfer")
+public String transferForm(Model model) {
+    model.addAttribute("warehouses",
+        warehouseService.getAll().stream().map(WarehouseResponse::from).toList());
+    return "transfer";
+}
 
-Perform the major operations using only browser links/forms, without manually typing application URLs after entering the UI.
+@PostMapping("/transfer")
+public String transfer(@RequestParam String from, @RequestParam String to, @RequestParam int quantity) {
+    warehouseService.transfer(from, to, quantity);
+    return "redirect:/transfer";
+}
+```
+
+## Your task
+
+1. Read `PaymentService`, `PaymentRequest`, `PaymentResponse`,
+   `PaymentController`.
+2. A `GET` page shows the form; put the accounts (as `AccountResponse`s) in the
+   model for the drop-downs.
+3. Form: source `<select>`, target `<select>`, amount input, submit.
+4. `@PostMapping` reads the three fields with `@RequestParam`, calls
+   `processPayment(...)`, redirects sensibly.
+5. Reuse TH-10's error handling for failures.
+
+## Verify
+
+Valid GBP→GBP payment `1111 → 4444` for `50`: source drops, target rises, both
+get transactions. A failing payment (currency mismatch `1111`→`2222`, or amount
+over balance) is reported without a crash.
+
+## Done when
+
+A valid payment moves money and records transactions on both accounts; a failing
+one is reported gracefully.
 
 ---
 
-# EHB Ticket TH-13 — Preserve and Verify the REST API
+# EHB Ticket TH-12 — Add Simple Navigation (and Tidy Up)
 
 ## Objective
 
-Confirm that adding the Thymeleaf presentation layer has not damaged the REST API built during Stage 2.
+Make the UI navigable by links instead of typed URLs. Optionally remove obvious
+template duplication — only if it genuinely helps.
 
-## Why this matters
+## Background for beginners
 
-The project should now have **two presentation mechanisms** over the same application logic:
+For fixed destinations a plain link is enough: `<a href="/">Home</a>`. Use
+`th:href="@{...}"` only when the URL is built from data.
+
+**Optional fragments** (only if a block is copy-pasted across pages):
+
+```html
+<nav th:fragment="mainNav"> ... </nav>
+```
+
+```html
+<div th:replace="~{fragments/nav :: mainNav}"></div>
+```
+
+> **Do not over-build.** No layout library, CSS, styled nav bar, or a fragment
+> for every element. A handful of plain links is enough.
+
+## Worked example
+
+```html
+<nav>
+    <a href="/">Home</a> |
+    <a href="/accounts">Accounts</a> |
+    <a href="/businesses">Businesses</a> |
+    <a href="/payments/new">New payment</a>
+</nav>
+```
+
+## Your task
+
+Add plain links so you can reach the accounts list, businesses list, payment
+form, and get back from a details page. Extract a nav fragment only if
+duplication genuinely bothers you.
+
+## Verify
+
+From the home page, do every main journey using only clicks — never typing a URL.
+
+## Done when
+
+Every main page is reachable by clicking, no CSS/layout framework was added, and
+any fragment clearly reduced duplication.
+
+---
+
+# EHB Ticket TH-13 — Confirm the REST API Still Works
+
+## Objective
+
+Prove the Thymeleaf UI didn't break the Stage 2 REST API. Two front doors, one
+set of services.
+
+## Background for beginners
 
 ```text
 REST client → @RestController ┐
                               ├→ Services → Repository → Domain
-Browser UI → @Controller ─────┘
+Browser     → @Controller ────┘
 ```
 
-Neither should replace the other.
+Both controllers are adapters: translate request → service call → response (JSON
+or HTML). Rules live in services/domain, which is why both can call the same
+service and neither should call the other.
 
-## Requirements
+## Your task
 
-1. Run:
+1. `mvn test` — all Stage 1 and 2 tests still green.
+2. Spot-check REST (should still be JSON/plain text):
 
-```bash
-mvn test
-```
+   ```text
+   GET  /api/status
+   GET  /api/accounts
+   GET  /api/accounts/1111
+   GET  /api/accounts/1111/transactions
+   POST /api/accounts/1111/deposit     { "depositAmount": 25.00 }
+   POST /api/accounts/1111/withdraw    { "withdrawAmount": 10.00 }
+   POST /api/payments                  { "sourceAccountNumber": "1111", "targetAccountNumber": "4444", "paymentAmount": 5.00 }
+   GET  /api/businesses
+   ```
 
-2. Manually verify representative REST endpoints with Postman or another API client:
-   - account lookup;
-   - transaction history;
-   - deposit or withdrawal;
-   - payment;
-   - business lookup.
-3. Confirm REST endpoints still return their expected JSON/plain-text forms.
-4. Confirm the browser UI returns HTML.
-5. Do not make REST controllers depend on UI controllers or Thymeleaf.
+3. Confirm UI routes return HTML.
+4. Confirm no `@RestController` depends on a UI controller/Thymeleaf, and the UI
+   controller calls services directly (never HTTP to `/api/...`).
 
-## Reflection questions
-
-Be able to explain:
+## Reflection
 
 - Why can both controller types call the same service?
-- Why shouldn't the Thymeleaf controller call the REST controller?
-- Why shouldn't the server make HTTP calls to itself merely to reach its own service functionality?
-- Which layer contains the actual banking rules?
+- Why shouldn't the UI controller call the REST controller?
+- Why is it wrong for the server to HTTP-call its own `/api/...` to reuse it?
+- Which layer holds the banking rules?
+
+## Done when
+
+`mvn test` green; REST returns expected JSON/text; UI returns HTML; both
+controllers depend only on the services.
 
 ---
 
@@ -861,105 +1017,70 @@ Be able to explain:
 
 ## Objective
 
-Verify the complete Thymeleaf UI and consolidate what you learned before moving to JPA/PostgreSQL.
-
-Do not add new features during this ticket unless verification exposes a genuine bug.
+Walk the whole UI as a user, confirm it works together, and be able to explain
+the mechanics before Stage 3. Don't add features unless the walkthrough finds a
+real bug.
 
 ## Preparation
 
-Restart the application to restore the known in-memory seed state.
+Restart to restore seed state (1111=500, 2222=0, 3333=0, 4444=500, 5555=0). Run
+`mvn test` — all green.
 
-Run:
+## Browser walkthrough (clicks/forms only)
 
-```bash
-mvn test
-```
+1. Home page. 2. See accounts. 3. See businesses. 4. Open a business + its
+accounts. 5. Open an account, note balance. 6. View its history (empty ones say
+so). 7. Deposit → redirected page shows new balance + `INCOMING` row. 8. Valid
+withdrawal → updated state. 9. Valid payment `1111 → 4444`; check both accounts
+changed with new transactions. 10. Trigger a failure (over-balance withdrawal or
+currency mismatch) → readable message, state still valid.
 
-The existing Stage 1 and Stage 2 tests must remain green.
-
-## Browser verification scenario
-
-Using the browser UI:
-
-1. open the EHB home page;
-2. confirm the seeded accounts are visible/selectable;
-3. confirm the seeded businesses are visible/selectable;
-4. view a business and its accounts;
-5. open an account and note its balance;
-6. view its transaction history;
-7. make a deposit;
-8. confirm the redirected account page shows the updated balance/history;
-9. make a valid withdrawal;
-10. confirm the updated state;
-11. make a valid payment between compatible accounts;
-12. inspect source and target accounts afterwards;
-13. deliberately trigger an insufficient-funds error;
-14. confirm the UI reports the failure and account state remains valid.
-
-## Architecture checkpoint
-
-At the end of Stage 2.5, be able to explain the deposit flow:
+## Architecture checkpoint — the deposit flow
 
 ```text
-Browser requests account page
-        ↓
-Spring MVC routes GET to @Controller
-        ↓
-Controller calls AccountService
-        ↓
-Controller puts account/transactions into Model
-        ↓
-Thymeleaf renders HTML
-        ↓
-Browser displays page
+Browser GETs account page
+   → Spring MVC routes GET to @Controller
+   → Controller asks AccountService for account + transactions
+   → Controller puts them in the Model
+   → Thymeleaf renders HTML
+   → Browser displays page
 
 User submits deposit form
-        ↓
-Browser sends HTTP POST form data
-        ↓
-Spring MVC routes POST to @Controller
-        ↓
-Controller receives account number + amount
-        ↓
-Controller calls AccountService.deposit(...)
-        ↓
-Service obtains Account from repository
-        ↓
-Account domain method applies business rules
-        ↓
-Controller returns redirect
-        ↓
-Browser performs fresh GET
-        ↓
-current backend state is rendered by Thymeleaf
+   → Browser sends HTTP POST form fields
+   → Spring MVC routes POST to @Controller
+   → Controller reads accountNumber (@PathVariable) + amount (@RequestParam)
+   → Controller calls AccountService.deposit(...)
+   → Service loads the Account from the repository
+   → Account domain method applies the rules
+   → Controller returns redirect:/accounts/{number}
+   → Browser performs a fresh GET
+   → Thymeleaf renders the updated state
 ```
 
-Also be able to explain the difference between this and the existing REST flow:
+Contrast the outputs:
 
 ```text
-REST:
-Controller → DTO → Jackson → JSON
-
-Thymeleaf UI:
-Controller → Model → Thymeleaf → HTML
+REST:         Controller → DTO → Jackson → JSON
+Thymeleaf UI: Controller → Model → Thymeleaf → HTML
 ```
 
 ## Completion criteria
 
 Stage 2.5 is complete when:
 
-- the main existing banking operations can be performed through the browser;
-- no JavaScript is required for normal operation;
-- no CSS or frontend framework has been introduced;
-- the existing REST API remains functional;
+- every main banking operation works in the browser;
+- no JavaScript is needed for normal use;
+- no CSS or frontend framework was introduced;
+- the REST API still works;
 - both REST and UI controllers reuse the service layer;
-- domain rules remain in the backend/domain rather than HTML;
-- no database has been introduced;
-- the test suite remains green;
-- you understand the basic roles of `@Controller`, `Model`, Thymeleaf templates, HTML forms, and redirects;
+- banking rules live in domain/service, not HTML/controllers;
+- no database yet;
+- `mvn test` is green;
+- you can explain `@Controller`, `Model`, templates, `th:text`, `th:each`,
+  `th:href`, HTML forms, `@RequestParam`, and POST/Redirect/GET;
 - the UI is crude but usable.
 
-A suitable commit message might be:
+Suggested commit message:
 
 ```text
 Add minimal Thymeleaf banking UI
@@ -986,18 +1107,17 @@ External requests ──┤
                          Domain model
 ```
 
-Stage 3 will replace the in-memory storage with JPA/PostgreSQL.
-
-A particularly useful architectural observation is that neither the REST API nor the Thymeleaf UI should need to know whether `AccountRepository` ultimately stores data in a Java `Map` or PostgreSQL.
+Stage 3 will replace the in-memory storage with JPA/PostgreSQL. A particularly
+useful observation: because the UI talks to the **services** (not storage), neither
+the REST API nor the Thymeleaf UI should need to know whether `AccountRepository`
+stores data in a Java `Map` or in PostgreSQL.
 
 The intended progression remains:
 
 ```text
-Stage 1 — Plain Java domain model
-        COMPLETE
+Stage 1 — Plain Java domain model            COMPLETE
             ↓
-Stage 2 — Spring Boot + REST
-        COMPLETE
+Stage 2 — Spring Boot + REST                 COMPLETE
             ↓
 Stage 2.5 — Minimal Spring MVC + Thymeleaf UI
             ↓
@@ -1008,4 +1128,6 @@ Stage 4 — Microservices + Kafka
 Stage 5 — Docker + AWS
 ```
 
-Do not expand Stage 2.5 into a frontend project after these requirements are satisfied. Its purpose is to provide a small usable UI while reinforcing Spring MVC concepts before persistence work begins.
+Do not expand Stage 2.5 into a frontend project after these requirements are
+satisfied. Its purpose is to provide a small usable UI while reinforcing Spring
+MVC concepts before persistence work begins.
