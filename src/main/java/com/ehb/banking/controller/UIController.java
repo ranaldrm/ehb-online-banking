@@ -10,6 +10,7 @@ public class UIController {
     
     @GetMapping("/")
     public String bankHome(Model model) {
+        model.addAttribute("pageStatus", "EHB is running");
         return "bankhome";
 
     }
