@@ -5,5 +5,18 @@
 </head>
 <body>
     <h1 th:text="${pageStatus}">EHB Online Banking</h1>
+    <table>
+        <tr>
+            <th>Account Number</th>
+            <th>Currency</th>
+            <th>Balance</th>
+        </tr>
+        <tr th:each="account : ${accounts}">
+            <td th:text="${account.accountNumber}">number</td>
+            <td th:text="${account.currency}">currency</td>
+            <td th:text="${account.balance}">balance</td>
+
+        </tr>
+    </table>
 </body>
 </html>
