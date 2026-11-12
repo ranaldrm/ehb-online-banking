@@ -10,13 +10,17 @@
             <th>Account Number</th>
             <th>Currency</th>
             <th>Balance</th>
+            <th>More</th>
         </tr>
         <tr th:each="account : ${accounts}">
             <td th:text="${account.accountNumber}">number</td>
             <td th:text="${account.currency}">currency</td>
             <td th:text="${account.balance}">balance</td>
-
+            <td>
+                <a th:href="@{/accounts/{accountNumber}(accountNumber=${account.accountNumber})}">View</a>
+            </td>
         </tr>
+
     </table>
 </body>
 </html>

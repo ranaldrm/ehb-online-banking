@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EHB Account Details</title>
+</head>
+<body>
+    <h1 >EHB Online Banking</h1>
+    <table>
+        <tr>
+            <th>Account Number</th>
+            <th>Currency</th>
+            <th>Balance</th>
+
+        </tr>
+        <tr >
+            <td th:text="${account.accountNumber}">number</td>
+            <td th:text="${account.currency}">currency</td>
+            <td th:text="${account.balance}">balance</td>
+
+        </tr>
+
+    </table>
+</body>
+</html>
