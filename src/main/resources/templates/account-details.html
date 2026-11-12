@@ -4,7 +4,7 @@
     <title>EHB Account Details</title>
 </head>
 <body>
-    <h1 >EHB Online Banking</h1>
+    <h1>EHB Online Banking</h1>
     <table>
         <tr>
             <th>Account Number</th>
@@ -12,7 +12,7 @@
             <th>Balance</th>
 
         </tr>
-        <tr >
+        <tr>
             <td th:text="${account.accountNumber}">number</td>
             <td th:text="${account.currency}">currency</td>
             <td th:text="${account.balance}">balance</td>
@@ -20,5 +20,24 @@
         </tr>
 
     </table>
+
+    <h2>Transaction history</h2>
+
+    <p th:if="${transactions.isEmpty()}">No transactions</p>
+
+    <table th:unless="${transactions.isEmpty()}">
+        <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>When</th>
+        </tr>
+        <tr th:each="transaction : ${transactions}">
+            <td th:text="${transaction.transactionType}">type</td>
+            <td th:text="${transaction.transactionAmount}">amount</td>
+            <td th:text="${transaction.timestamp}">when</td>
+        </tr>
+    </table>
+
+    <a th:href="@{/}">Back to accounts</a>
 </body>
 </html>

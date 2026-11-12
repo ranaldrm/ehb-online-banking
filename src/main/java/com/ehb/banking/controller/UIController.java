@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.ehb.banking.dto.AccountResponse;
+import com.ehb.banking.dto.TransactionResponse;
 import com.ehb.banking.service.AccountService;
 
 @Controller
@@ -36,7 +37,12 @@ public class UIController {
     @GetMapping("/accounts/{accountNumber}")
     public String accountDetails(@PathVariable String accountNumber ,Model model) {
         AccountResponse account = AccountResponse.from(accountService.getAccountByNumber(accountNumber));
+        List<TransactionResponse> transactions = accountService.getTransactionHistory(accountNumber)
+            .stream()
+            .map(TransactionResponse::from)
+            .toList();
         model.addAttribute("account", account);
+        model.addAttribute("transactions", transactions);
         return "account-details";
 
     }

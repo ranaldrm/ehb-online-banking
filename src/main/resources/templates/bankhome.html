@@ -5,6 +5,7 @@
 </head>
 <body>
     <h1 th:text="${pageStatus}">EHB Online Banking</h1>
+    <h2>Account Details</h2>
     <table>
         <tr>
             <th>Account Number</th>
@@ -20,7 +21,9 @@
                 <a th:href="@{/accounts/{accountNumber}(accountNumber=${account.accountNumber})}">View</a>
             </td>
         </tr>
-
     </table>
+   
+
+
 </body>
 </html>
