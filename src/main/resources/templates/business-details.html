@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EHB Business Details</title>
+</head>
+<body>
+    <h1>EHB Online Banking</h1>
+    <table>
+        <tr>
+            <th>Business ID </th>
+            <th>Business name</th>
+
+
+        </tr>
+        <tr>
+            <td th:text="${business.businessID}">ID</td>
+            <td th:text="${business.businessName}">Name</td>
+ 
+
+        </tr>
+
+    </table>
+
+    <h2>Owned Accounts</h2>
+
+    <p th:if="${accounts.isEmpty()}">No Accounts</p>
+
+    <table th:unless="${accounts.isEmpty()}">
+        <tr>
+            <th>Number</th>
+            <th>Currency</th>
+            <th>Balance</th>
+        </tr>
+        <tr th:each="account : ${accounts}">
+            <td th:text="${account.accountNumber}">number</td>
+            <td th:text="${account.currency}">currency</td>
+            <td th:text="${account.balance}">balance</td>
+        </tr>
+    </table>
+
+    <a th:href="@{/businesses}">Back to businesses</a>
+</body>
+</html>

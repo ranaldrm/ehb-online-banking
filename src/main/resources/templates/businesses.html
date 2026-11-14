@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EHB Online Banking- businesses</title>
+</head>
+<body>
+    <h2>Businesses</h2>
+    <table>
+        <tr>
+            <th>Business ID</th>
+            <th>Business Name</th>
+            <th>More</th>
+        </tr>
+        <tr th:each="business : ${businesses}">
+            <td th:text="${business.businessID}">ID</td>
+            <td th:text="${business.businessName}">Name</td>
+            <td>
+                <a th:href="@{/businesses/{businessID}(businessID=${business.businessID})}">View</a>
+            </td>
+        </tr>
+    </table>
+   
+
+
+</body>
+</html>
